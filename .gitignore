@@ -1,0 +1,11 @@
+.pgdata
+backend/target/
+frontend/node_modules/
+frontend/.next/
+frontend/.env.local
+.prompts/
+AGENTS.md
+CLAUDE.md
+.env.local
+
+!.claude/settings.local.json

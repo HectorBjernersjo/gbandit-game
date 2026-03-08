@@ -1,0 +1,1 @@
+-- Drop game-specific tables here.

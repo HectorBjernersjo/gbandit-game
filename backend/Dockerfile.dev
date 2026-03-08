@@ -1,0 +1,10 @@
+FROM rust:1-bookworm
+
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+RUN cargo install sqlx-cli --no-default-features --features postgres
+
+WORKDIR /app
+
+COPY backend/ .
+
+CMD ["sh", "-c", "sqlx migrate run --source ./migrations && cargo build && exec ./target/debug/basegame-api"]

@@ -1,0 +1,86 @@
+networks:
+  kognito-net:
+    name: kognito-net
+    external: true
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${PGUSER}
+      POSTGRES_PASSWORD: ${PGPASSWORD}
+      POSTGRES_DB: ${PGDATABASE}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      kognito-net:
+        aliases:
+          - ${GAME_SLUG}-db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PGUSER} -d ${PGDATABASE}"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.dev
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - cargo-registry:/usr/local/cargo/registry
+      - cargo-target:/app/target
+    environment:
+      DATABASE_URL: postgres://${PGUSER}:${PGPASSWORD}@db:5432/${PGDATABASE}?sslmode=disable
+      SQLX_OFFLINE: "false"
+      SIGNING_PUBLIC_KEY: ${SIGNING_PUBLIC_KEY}
+    networks:
+      kognito-net:
+        aliases:
+          - ${GAME_SLUG}-backend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/api/health"]
+      interval: 5s
+      timeout: 2s
+      retries: 60
+      start_period: 120s
+
+  seed:
+    image: postgres:16
+    depends_on:
+      backend:
+        condition: service_healthy
+    volumes:
+      - ./backend/dev-seed.sql:/seed.sql:ro
+    entrypoint:
+      - psql
+      - postgres://${PGUSER}:${PGPASSWORD}@db:5432/${PGDATABASE}
+    command: ["-v", "ON_ERROR_STOP=1", "-f", "/seed.sql"]
+    networks:
+      - kognito-net
+
+  frontend:
+    build:
+      context: ./frontend
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+    networks:
+      kognito-net:
+        aliases:
+          - ${GAME_SLUG}-frontend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 5s
+      timeout: 2s
+      retries: 60
+      start_period: 120s
+
+volumes:
+  pgdata:
+  cargo-registry:
+  cargo-target:
