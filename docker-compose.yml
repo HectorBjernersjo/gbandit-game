@@ -35,7 +35,7 @@ services:
       - cargo-registry:/usr/local/cargo/registry
       - cargo-target:/app/target
     environment:
-      DATABASE_URL: postgres://${PGUSER}:${PGPASSWORD}@db:5432/${PGDATABASE}?sslmode=disable
+      DATABASE_URL: postgres://${PGUSER}:${PGPASSWORD}@${GAME_SLUG}-db:5432/${PGDATABASE}?sslmode=disable
       SQLX_OFFLINE: "false"
       SIGNING_PUBLIC_KEY: ${SIGNING_PUBLIC_KEY}
     networks:
@@ -58,7 +58,7 @@ services:
       - ./backend/dev-seed.sql:/seed.sql:ro
     entrypoint:
       - psql
-      - postgres://${PGUSER}:${PGPASSWORD}@db:5432/${PGDATABASE}
+      - postgres://${PGUSER}:${PGPASSWORD}@${GAME_SLUG}-db:5432/${PGDATABASE}
     command: ["-v", "ON_ERROR_STOP=1", "-f", "/seed.sql"]
     networks:
       - kognito-net
