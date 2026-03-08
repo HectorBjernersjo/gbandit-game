@@ -5,7 +5,7 @@ Backend (Rust): http://${GAME_SLUG}.dev.localhost:${INFRA_PORT}/api (via gateway
 Database (PostgreSQL): localhost:${DB_PORT}
 
 Everything runs in docker. There is no hot reload — after making changes, rebuild with the scripts below.
-Never use regular bun or cargo commands, allways use the scripts which build and run in docker.
+Never use raw bun, cargo, or docker compose commands directly. Always use the provided scripts.
 
 ## Commands
 To rebuild and restart a service:
@@ -14,17 +14,25 @@ To rebuild and restart a service:
 ./scripts/rebuild.sh frontend
 ```
 
-To run backend tests:
+To run cargo commands (runs migrations first):
 ```bash
-./scripts/test.sh              # run all tests
-./scripts/test.sh test_name    # run a specific test
+./scripts/cargo.sh test              # run all tests
+./scripts/cargo.sh test test_name    # run a specific test
+./scripts/cargo.sh add some-crate    # add a dependency
 ```
 
-To see logs:
+To run bun commands:
+```bash
+./scripts/bun.sh add some-package    # add a dependency
+./scripts/bun.sh remove some-package # remove a dependency
+```
+
+For docker compose commands (logs, ps, etc.):
 ```bash
 ./scripts/dc.sh logs --timestamps
 ./scripts/dc.sh logs backend --timestamps
 ./scripts/dc.sh logs frontend --timestamps
+./scripts/dc.sh ps
 ```
 
 If you need to restart the game from scratch:

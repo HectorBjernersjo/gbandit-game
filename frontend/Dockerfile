@@ -1,12 +1,12 @@
-FROM node:22-alpine AS builder
+FROM oven/bun:1-alpine AS builder
 
 WORKDIR /app
 
-COPY package.json ./
-RUN npm install
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
 
 COPY . .
-RUN npm run build
+RUN bun run build
 RUN find /app/dist -type f \( -name '*.html' -o -name '*.css' -o -name '*.js' -o -name '*.json' -o -name '*.svg' \) -exec gzip -k -9 {} \;
 
 FROM nginx:alpine
