@@ -43,7 +43,7 @@
       "Bash(bash scripts/rebuild.sh:*)",
       "Bash(timeout 120 grep:*)",
       "Bash(timeout 180 grep:*)",
-      "Bash(SESSION=\"eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiIyMiIsIm5hbWUiOiJHdWVzdCIsImlzX2Fub24iOnRydWUsImV4cCI6MTc3MTY5NTc2MiwiaWF0IjoxNzcxNjk0ODYyfQ.mIrxfANyr1AWX-A9WR3kpiWebfRizc1VVIgfznyMRq0RLKHrS-dyeSGwzySw2Yc8W5aw4__hRQZrfn_0gNN_oQ\" && curl -s -b \"session=$SESSION\" \"http://default.dev.localhost:3031/platform/me\" 2>&1)",
+      "Bash(SESSION=\"eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiIyMiIsIm5hbWUiOiJHdWVzdCIsImlzX2Fub24iOnRydWUsImV4cCI6MTc3MTY5NTc2MiwiaWF0IjoxNzcxNjk0ODYyfQ.mIrxfANyr1AWX-A9WR3kpiWebfRizc1VVIgfznyMRq0RLKHrS-dyeSGwzySw2Yc8W5aw4__hRQZrfn_0gNN_oQ\" && curl -s -b \"session=$SESSION\" \"http://default.gbandit.localhost:3031/platform/me\" 2>&1)",
       "Bash(test:*)",
       "mcp__chrome-devtools__list_console_messages",
       "mcp__chrome-devtools__get_console_message",

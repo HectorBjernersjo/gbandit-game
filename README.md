@@ -13,7 +13,7 @@ A game built on the gbandit platform. Rust/Axum backend, React/Vite frontend, Po
 ./scripts/init.sh
 ```
 
-The game is accessible at http://default.dev.localhost:80 (routed through the infra gateway).
+The game is accessible at http://default.gbandit.localhost:80 (routed through the infra gateway).
 
 ## Scripts
 
@@ -29,8 +29,8 @@ The game is accessible at http://default.dev.localhost:80 (routed through the in
 ## Architecture
 
 - This is a **game repo**. It depends on the shared infra (auth, gateway, me) running separately.
-- The gateway routes `{slug}.dev.localhost` to this game's backend/frontend via Docker DNS on the shared `kognito-net` network.
-- Auth is handled by the infra gateway — backends receive user identity via signed `X-Kognito-*` headers. Games never manage users directly.
+- The gateway routes `{slug}.gbandit.localhost` to this game's backend/frontend via Docker DNS on the shared `gbandit-net` network.
+- Auth is handled by the infra gateway — backends receive user identity via signed `X-Gbandit-*` headers. Games never manage users directly.
 - There is no hot reload — after making changes, rebuild with `./scripts/rebuild.sh`.
 
 ## Creating a Migration

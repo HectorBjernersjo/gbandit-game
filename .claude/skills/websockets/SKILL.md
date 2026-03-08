@@ -17,7 +17,7 @@ Do not create separate WebSocket endpoints per feature.
 
 The gateway handles authentication automatically:
 1. Browser opens WebSocket to `/api/ws` — session cookie sent automatically
-2. Gateway validates the JWT from cookie, injects `X-Kognito-*` identity headers, signs them with Ed25519
+2. Gateway validates the JWT from cookie, injects `X-Gbandit-*` identity headers, signs them with Ed25519
 3. Game backend receives the upgrade request with identity headers
 4. The existing `SessionUser` extractor works on the WS upgrade request — use it directly in the handler signature
 5. Gateway tunnels the WebSocket bidirectionally after upgrade

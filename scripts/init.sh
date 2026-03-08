@@ -36,7 +36,7 @@ fi
 echo
 
 # --- Shared network ---
-docker network create kognito-net 2>/dev/null || true
+docker network create gbandit-net 2>/dev/null || true
 
 # --- Game stack ---
 echo "=== Game stack ($GAME_SLUG) ==="
@@ -75,6 +75,6 @@ fi
 
 echo
 echo "Game running at:"
-echo "  Game:     http://$GAME_SLUG.dev.localhost:$INFRA_PORT"
+echo "  Game:     http://$GAME_SLUG.gbandit.localhost:$INFRA_PORT"
 echo "  Database: localhost:$DB_PORT"
 echo "  Chrome:   http://localhost:$CHROME_DEBUG_PORT"

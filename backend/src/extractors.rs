@@ -6,7 +6,7 @@ use crate::config::Config;
 use crate::errors::AppError;
 
 /// User identity from trusted gateway headers.
-/// The gateway validates the JWT and passes identity via X-Kognito-* headers.
+/// The gateway validates the JWT and passes identity via X-Gbandit-* headers.
 /// The gateway's Ed25519 signature is verified first.
 #[derive(Debug, Clone, Serialize)]
 pub struct SessionUser {
@@ -33,44 +33,44 @@ where
         // Read raw header string values (used for both signature verification and parsing)
         let user_id_str = parts
             .headers
-            .get("x-kognito-user-id")
+            .get("x-gbandit-user-id")
             .and_then(|v| v.to_str().ok())
-            .ok_or_else(|| AppError::Unauthorized("missing or invalid X-Kognito-User-Id".into()))?;
+            .ok_or_else(|| AppError::Unauthorized("missing or invalid X-Gbandit-User-Id".into()))?;
 
         let user_name_str = parts
             .headers
-            .get("x-kognito-user-name")
+            .get("x-gbandit-user-name")
             .and_then(|v| v.to_str().ok())
             .unwrap_or("");
 
         let is_anon_str = parts
             .headers
-            .get("x-kognito-is-anon")
+            .get("x-gbandit-is-anon")
             .and_then(|v| v.to_str().ok())
             .unwrap_or("false");
 
         let prev_anon_str = parts
             .headers
-            .get("x-kognito-prev-anon-user-ids")
+            .get("x-gbandit-prev-anon-user-ids")
             .and_then(|v| v.to_str().ok())
             .unwrap_or("");
 
         // Verify Ed25519 signature from gateway
         let sig = parts
             .headers
-            .get("x-kognito-sig")
+            .get("x-gbandit-sig")
             .and_then(|v| v.to_str().ok())
-            .ok_or_else(|| AppError::Unauthorized("missing X-Kognito-Sig".into()))?;
+            .ok_or_else(|| AppError::Unauthorized("missing X-Gbandit-Sig".into()))?;
 
         let timestamp_str = parts
             .headers
-            .get("x-kognito-timestamp")
+            .get("x-gbandit-timestamp")
             .and_then(|v| v.to_str().ok())
-            .ok_or_else(|| AppError::Unauthorized("missing X-Kognito-Timestamp".into()))?;
+            .ok_or_else(|| AppError::Unauthorized("missing X-Gbandit-Timestamp".into()))?;
 
         let timestamp: u64 = timestamp_str
             .parse()
-            .map_err(|_| AppError::Unauthorized("invalid X-Kognito-Timestamp".into()))?;
+            .map_err(|_| AppError::Unauthorized("invalid X-Gbandit-Timestamp".into()))?;
 
         crate::sig::verify_timestamp(timestamp)
             .map_err(AppError::Unauthorized)?;
@@ -93,13 +93,13 @@ where
         );
 
         if !crate::sig::verify(&config.verifying_keys, &canonical, sig) {
-            return Err(AppError::Unauthorized("invalid X-Kognito-Sig".into()));
+            return Err(AppError::Unauthorized("invalid X-Gbandit-Sig".into()));
         }
 
         // Parse typed values
         let id: i64 = user_id_str
             .parse()
-            .map_err(|_| AppError::Unauthorized("invalid X-Kognito-User-Id".into()))?;
+            .map_err(|_| AppError::Unauthorized("invalid X-Gbandit-User-Id".into()))?;
 
         let is_anon = is_anon_str == "true";
 

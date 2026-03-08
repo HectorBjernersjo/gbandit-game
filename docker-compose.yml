@@ -1,6 +1,6 @@
 networks:
-  kognito-net:
-    name: kognito-net
+  gbandit-net:
+    name: gbandit-net
     external: true
 
 services:
@@ -15,7 +15,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
-      kognito-net:
+      gbandit-net:
         aliases:
           - ${GAME_SLUG}-db
     healthcheck:
@@ -39,7 +39,7 @@ services:
       SQLX_OFFLINE: "false"
       SIGNING_PUBLIC_KEY: ${SIGNING_PUBLIC_KEY}
     networks:
-      kognito-net:
+      gbandit-net:
         aliases:
           - ${GAME_SLUG}-backend
     healthcheck:
@@ -61,7 +61,7 @@ services:
       - postgres://${PGUSER}:${PGPASSWORD}@${GAME_SLUG}-db:5432/${PGDATABASE}
     command: ["-v", "ON_ERROR_STOP=1", "-f", "/seed.sql"]
     networks:
-      - kognito-net
+      - gbandit-net
 
   frontend:
     build:
@@ -70,7 +70,7 @@ services:
       seed:
         condition: service_completed_successfully
     networks:
-      kognito-net:
+      gbandit-net:
         aliases:
           - ${GAME_SLUG}-frontend
     healthcheck:

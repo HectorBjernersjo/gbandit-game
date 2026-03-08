@@ -1,7 +1,7 @@
 ## Running the project
 The project is already running you can find it on the following urls:
-Frontend: http://${GAME_SLUG}.dev.localhost:${INFRA_PORT}
-Backend (Rust): http://${GAME_SLUG}.dev.localhost:${INFRA_PORT}/api (via gateway)
+Frontend: http://${GAME_SLUG}.gbandit.localhost:${INFRA_PORT}
+Backend (Rust): http://${GAME_SLUG}.gbandit.localhost:${INFRA_PORT}/api (via gateway)
 Database (PostgreSQL): localhost:${DB_PORT}
 
 Everything runs in docker. There is no hot reload — after making changes, rebuild with the scripts below.
@@ -46,16 +46,16 @@ To run queries directly on the db:
 ```
 
 ## Testing authenticated endpoints
-- You can sign in to the frontend with ai@kognito.se / TjabbaTjena999!
+- You can sign in to the frontend with ai@gbandit.se / TjabbaTjena999!
 - In dev, you can skip the full OAuth flow and test backend endpoints directly with curl using the `X-Auth-Dev` header.
   Pass a user ID (integer) and you'll be authenticated as that user:
   ```bash
-  curl -H "X-Auth-Dev: 2" http://${GAME_SLUG}.dev.localhost:${INFRA_PORT}/api/me
+  curl -H "X-Auth-Dev: 2" http://${GAME_SLUG}.gbandit.localhost:${INFRA_PORT}/api/me
   ```
-- User ID 2 is ai@kognito.se
+- User ID 2 is ai@gbandit.se
 
 ## Good to know
-- User identity is owned by the auth service (infra repo). Game backends receive a user_id from the gateway via `X-Kognito-*` headers and never manage users directly.
+- User identity is owned by the auth service (infra repo). Game backends receive a user_id from the gateway via `X-Gbandit-*` headers and never manage users directly.
 - When investigating an issue, it can be a good idea to add console logs to identify the problem
 
 ## Rules
