@@ -28,6 +28,7 @@ services:
     build:
       context: .
       dockerfile: backend/Dockerfile.dev
+    user: "${HOST_UID}:${HOST_GID}"
     depends_on:
       db:
         condition: service_healthy
@@ -35,6 +36,7 @@ services:
       - cargo-registry:/usr/local/cargo/registry
       - cargo-target:/app/target
     environment:
+      HOME: /tmp
       DATABASE_URL: postgres://${PGUSER}:${PGPASSWORD}@${GAME_SLUG}-db:5432/${PGDATABASE}?sslmode=disable
       SQLX_OFFLINE: "false"
       SIGNING_PUBLIC_KEY: ${SIGNING_PUBLIC_KEY}

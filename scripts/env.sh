@@ -39,3 +39,7 @@ export CHROME_DEBUG_PORT="$((9000 + OFFSET))"
 
 # --- Host-side DATABASE_URL (for psql from host, not for docker) ---
 export DATABASE_URL="postgres://${PGUSER}:${PGPASSWORD}@localhost:${DB_PORT}/${PGDATABASE}?sslmode=disable"
+
+# --- Host user (for running containers as host user) ---
+export HOST_UID="$(id -u)"
+export HOST_GID="$(id -g)"
