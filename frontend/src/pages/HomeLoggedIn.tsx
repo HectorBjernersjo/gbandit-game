@@ -2,12 +2,12 @@ import { loginUrl } from "@/lib/auth";
 import { useUser } from "@/lib/auth-context";
 import { SignOutButton } from "@/components/SignOutButton";
 
-export function Dashboard() {
+export function HomeLoggedIn() {
   const user = useUser();
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-6">
-      <h1 className="text-3xl font-bold">Dashboard</h1>
+      <h1 className="text-3xl font-bold">Basegame</h1>
 
       {user.is_anon && (
         <div className="rounded-lg border border-foreground/20 bg-foreground/5 px-4 py-3 text-sm w-full max-w-md text-center">

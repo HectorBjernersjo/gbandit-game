@@ -18,11 +18,3 @@ export async function optionalUser(): Promise<SessionUser | null> {
 
   throw new Response(result.error.message, { status: result.error.status });
 }
-
-export async function checkAlreadyLoggedIn(): Promise<null> {
-  const result = await getMe();
-
-  if (result.isOk()) throw redirect("/dashboard");
-
-  return null;
-}

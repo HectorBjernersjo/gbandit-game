@@ -14,14 +14,17 @@ A game built on the gbandit platform. Rust/Axum backend, React/Vite frontend, Po
 ```
 
 The game is accessible at http://default.gbandit.localhost:80 (routed through the infra gateway).
+This repo uses a rebuild-and-redeploy workflow in development. After changing code, rebuild the affected service with `./scripts/rebuild.sh backend` or `./scripts/rebuild.sh frontend`.
 
 ## Scripts
 
 | Script | What it does |
 |---|---|
-| `./scripts/init.sh` | Start the full stack (db, backend, frontend, seed) |
+| `./scripts/init.sh` | Start the full stack (db, backend, frontend, seed) and set up local dev helpers |
 | `./scripts/rebuild.sh backend` | Rebuild and restart the backend |
 | `./scripts/rebuild.sh frontend` | Rebuild and restart the frontend |
+| `./scripts/cargo.sh <args>` | Run one-off Cargo/sqlx tasks inside the backend dev image |
+| `./scripts/bun.sh <args>` | Run one-off Bun tasks inside a disposable Bun container |
 | `./scripts/dc.sh logs --timestamps` | View logs |
 | `./scripts/psql.sh` | Open a psql shell to the database |
 | `railway up -s <service> --path-as-root <path>` | Deploy to Railway (see [RAILWAY_DEPLOYMENT.md](./RAILWAY_DEPLOYMENT.md)) |
@@ -31,7 +34,8 @@ The game is accessible at http://default.gbandit.localhost:80 (routed through th
 - This is a **game repo**. It depends on the shared infra (auth, gateway, me) running separately.
 - The gateway routes `{slug}.gbandit.localhost` to this game's backend/frontend via Docker DNS on the shared `gbandit-net` network.
 - Auth is handled by the infra gateway — backends receive user identity via signed `X-Gbandit-*` headers. Games never manage users directly.
-- There is no hot reload — after making changes, rebuild with `./scripts/rebuild.sh`.
+- There is no hot reload. Source changes do nothing until you rebuild the affected service.
+- Long-running app services are managed through Docker Compose via `./scripts/init.sh` and `./scripts/rebuild.sh`. Do not use ad hoc `cargo run` for the backend in this repo.
 
 ## Creating a Migration
 
@@ -42,6 +46,18 @@ sqlx migrate add -r your_migration_name
 ```
 
 Then rebuild the backend — migrations run automatically on startup.
+
+## Cargo And Bun Helpers
+
+- `./scripts/cargo.sh ...` runs inside the backend dev image, runs migrations first, and is intended for one-off commands such as `test` and `add`.
+- `./scripts/cargo.sh run` is intentionally unsupported. Use `./scripts/rebuild.sh backend` to build and run the backend service.
+- `./scripts/bun.sh ...` runs one-off Bun commands in a disposable container for dependency management and similar tasks.
+
+## Notes On `init.sh`
+
+- `./scripts/init.sh` expects the shared infra stack to already be running.
+- It also writes `AGENTS.md` and `CLAUDE.md` from `AGENTS.template.md`.
+- On local machines it may enable `direnv` and start Chromium remote debugging if available.
 
 ## Multiple Workspaces
 

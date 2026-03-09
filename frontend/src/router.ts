@@ -1,8 +1,7 @@
 import { createBrowserRouter } from "react-router";
-import { checkAlreadyLoggedIn, requireUser } from "@/lib/loaders";
+import { optionalUser, requireUser } from "@/lib/loaders";
 import { Home } from "@/pages/Home";
 import { AuthLayout } from "@/pages/AuthLayout";
-import { Dashboard } from "@/pages/Dashboard";
 import { NotFound } from "@/pages/NotFound";
 import { RouteError } from "@/pages/RouteError";
 import { Spinner } from "@/components/Spinner";
@@ -10,7 +9,7 @@ import { Spinner } from "@/components/Spinner";
 export const router = createBrowserRouter([
   {
     path: "/",
-    loader: checkAlreadyLoggedIn,
+    loader: optionalUser,
     Component: Home,
     HydrateFallback: Spinner,
   },
@@ -19,12 +18,7 @@ export const router = createBrowserRouter([
     Component: AuthLayout,
     ErrorBoundary: RouteError,
     HydrateFallback: Spinner,
-    children: [
-      {
-        path: "/dashboard",
-        Component: Dashboard,
-      },
-    ],
+    children: [],
   },
   {
     path: "*",
