@@ -14,10 +14,15 @@ if [ -f "$ROOT_DIR/.env.local" ]; then
 fi
 set +a
 
-# Show docker compose logs on failure. Call with: trap 'on_fail <project> <compose_file>' ERR
+# Show docker compose logs on failure. Call with: trap 'on_fail <project> <compose_file> [service]' ERR
 on_fail() {
   echo
   echo "=== FAILED — logs ==="
+  if [ $# -ge 3 ]; then
+    docker compose -p "$1" -f "$2" logs "$3" --timestamps --tail 50
+    return
+  fi
+
   docker compose -p "$1" -f "$2" logs --timestamps --tail 50
 }
 
@@ -39,7 +44,3 @@ export CHROME_DEBUG_PORT="$((9000 + OFFSET))"
 
 # --- Host-side DATABASE_URL (for psql from host, not for docker) ---
 export DATABASE_URL="postgres://${PGUSER}:${PGPASSWORD}@localhost:${DB_PORT}/${PGDATABASE}?sslmode=disable"
-
-# --- Host user (for running containers as host user) ---
-export HOST_UID="$(id -u)"
-export HOST_GID="$(id -g)"

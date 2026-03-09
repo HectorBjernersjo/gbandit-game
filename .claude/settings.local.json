@@ -48,7 +48,10 @@
       "mcp__chrome-devtools__list_console_messages",
       "mcp__chrome-devtools__get_console_message",
       "Bash(cat:*)",
-      "Bash(./scripts/psql.sh:*)"
+      "Bash(./scripts/psql.sh:*)",
+      "Bash(./scripts/bun.sh:*)",
+      "Bash(./scripts/cargo.sh:*)",
+      "Bash(./scripts/dc.sh down:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

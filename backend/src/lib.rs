@@ -44,8 +44,8 @@ pub fn app(state: AppState) -> Router {
     Router::new()
         .route("/", get(|| async { "running" }))
         .route("/api/me", get(routes::me::get_me))
-        .route("/api/health", get(routes::health::health))
         .fallback(fallback)
         .layer(TraceLayer::new_for_http())
+        .route("/api/health", get(routes::health::health))
         .with_state(state)
 }

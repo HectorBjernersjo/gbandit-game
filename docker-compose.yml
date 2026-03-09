@@ -26,19 +26,13 @@ services:
 
   backend:
     build:
-      context: .
-      dockerfile: backend/Dockerfile.dev
-    user: "${HOST_UID}:${HOST_GID}"
+      context: ./backend
+      dockerfile: Dockerfile.dev
     depends_on:
       db:
         condition: service_healthy
-    volumes:
-      - cargo-registry:/usr/local/cargo/registry
-      - cargo-target:/app/target
     environment:
-      HOME: /tmp
       DATABASE_URL: postgres://${PGUSER}:${PGPASSWORD}@${GAME_SLUG}-db:5432/${PGDATABASE}?sslmode=disable
-      SQLX_OFFLINE: "false"
       SIGNING_PUBLIC_KEY: ${SIGNING_PUBLIC_KEY}
     networks:
       gbandit-net:
@@ -49,7 +43,8 @@ services:
       interval: 5s
       timeout: 2s
       retries: 60
-      start_period: 120s
+      start_period: 5s
+      start_interval: 100ms
 
   seed:
     image: postgres:16
@@ -68,6 +63,7 @@ services:
   frontend:
     build:
       context: ./frontend
+      dockerfile: Dockerfile.dev
     depends_on:
       seed:
         condition: service_completed_successfully
@@ -80,9 +76,8 @@ services:
       interval: 5s
       timeout: 2s
       retries: 60
-      start_period: 120s
+      start_period: 5s
+      start_interval: 100ms
 
 volumes:
   pgdata:
-  cargo-registry:
-  cargo-target:

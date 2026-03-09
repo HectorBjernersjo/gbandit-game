@@ -5,9 +5,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "$SCRIPT_DIR/env.sh"
 
-docker compose -p "$GAME_PROJECT" -f "$ROOT_DIR/docker-compose.yml" \
-  run --rm \
+docker run --rm \
+  --user "$(id -u):$(id -g)" \
+  -e HOME=/tmp \
   -v "$ROOT_DIR/backend:/app" \
+  -w /app \
+  --network gbandit-net \
   -e DATABASE_URL="postgres://${PGUSER}:${PGPASSWORD}@${GAME_SLUG}-db:5432/${PGDATABASE}?sslmode=disable" \
-  backend \
-  sh -c "sqlx migrate run --source ./migrations && cargo $*"
+  "${GAME_PROJECT}-backend" \
+  cargo "$@"

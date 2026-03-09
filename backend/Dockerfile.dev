@@ -5,6 +5,15 @@ RUN cargo install sqlx-cli --no-default-features --features postgres
 
 WORKDIR /app
 
-COPY backend/ .
+COPY Cargo.toml Cargo.lock ./
+COPY src ./src
+COPY .sqlx ./.sqlx
+COPY migrations ./migrations
 
-CMD ["sh", "-c", "sqlx migrate run --source ./migrations && cargo build && exec ./target/debug/basegame-api"]
+RUN --mount=type=cache,target=/usr/local/cargo/registry \
+    --mount=type=cache,target=/app/target \
+    cargo build && cp target/debug/basegame-api /app/basegame-api
+
+EXPOSE 80
+
+CMD ["sh", "-c", "sqlx migrate run --source ./migrations && exec ./basegame-api"]
