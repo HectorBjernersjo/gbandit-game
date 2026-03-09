@@ -1,4 +1,4 @@
-use std::net::SocketAddr;
+use std::net::SocketAddr
 
 use sqlx::postgres::PgPoolOptions;
 use tokio::net::TcpListener;
