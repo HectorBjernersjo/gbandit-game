@@ -1,6 +1,7 @@
 use std::env;
 
 use ed25519_dalek::VerifyingKey;
+use thiserror::Error;
 
 #[derive(Clone)]
 pub struct Config {
@@ -9,23 +10,40 @@ pub struct Config {
     pub verifying_keys: Vec<VerifyingKey>,
 }
 
+#[derive(Debug, Error)]
+pub enum ConfigError {
+    #[error("SIGNING_PUBLIC_KEY must be set")]
+    MissingSigningPublicKey,
+
+    #[error("SIGNING_PUBLIC_KEY must be valid hex")]
+    InvalidSigningPublicKeyHex(#[from] hex::FromHexError),
+
+    #[error("SIGNING_PUBLIC_KEY must be 32 bytes")]
+    InvalidSigningPublicKeyLength,
+
+    #[error("invalid Ed25519 public key")]
+    InvalidSigningPublicKey(#[from] ed25519_dalek::SignatureError),
+
+    #[error("DATABASE_URL must be set")]
+    MissingDatabaseUrl,
+}
+
 impl Config {
-    pub fn from_env() -> Self {
+    pub fn from_env() -> Result<Self, ConfigError> {
         let verifying_keys: Vec<VerifyingKey> = env::var("SIGNING_PUBLIC_KEY")
-            .expect("SIGNING_PUBLIC_KEY must be set")
+            .map_err(|_| ConfigError::MissingSigningPublicKey)?
             .split(',')
             .map(|k| {
-                let bytes: [u8; 32] = hex::decode(k.trim())
-                    .expect("SIGNING_PUBLIC_KEY must be valid hex")
+                let bytes: [u8; 32] = hex::decode(k.trim())?
                     .try_into()
-                    .expect("SIGNING_PUBLIC_KEY must be 32 bytes");
-                VerifyingKey::from_bytes(&bytes).expect("invalid Ed25519 public key")
+                    .map_err(|_| ConfigError::InvalidSigningPublicKeyLength)?;
+                VerifyingKey::from_bytes(&bytes).map_err(ConfigError::from)
             })
-            .collect();
+            .collect::<Result<Vec<_>, ConfigError>>()?;
 
-        Self {
-            database_url: env::var("DATABASE_URL").expect("DATABASE_URL must be set"),
+        Ok(Self {
+            database_url: env::var("DATABASE_URL").map_err(|_| ConfigError::MissingDatabaseUrl)?,
             verifying_keys,
-        }
+        })
     }
 }

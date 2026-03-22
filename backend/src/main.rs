@@ -1,4 +1,5 @@
-use std::net::SocketAddr
+use std::error::Error;
+use std::net::SocketAddr;
 
 use sqlx::postgres::PgPoolOptions;
 use tokio::net::TcpListener;
@@ -16,19 +17,26 @@ async fn main() {
         )
         .init();
 
-    let config = Config::from_env();
+    if let Err(error) = run().await {
+        tracing::error!(error = %error, "backend failed to start");
+        std::process::exit(1);
+    }
+}
+
+async fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
+    let config = Config::from_env().map_err(log_startup_error("failed to load config"))?;
 
     let pool = PgPoolOptions::new()
         .max_connections(10)
         .connect(&config.database_url)
         .await
-        .expect("failed to connect to database");
+        .map_err(log_startup_error("failed to connect to database"))?;
 
     tracing::info!("running database migrations");
     sqlx::migrate!("./migrations")
         .run(&pool)
         .await
-        .expect("failed to run migrations");
+        .map_err(log_startup_error("failed to run migrations"))?;
 
     let state = AppState {
         pool,
@@ -41,17 +49,38 @@ async fn main() {
 
     tracing::info!("listening on {addr}");
 
-    let listener = TcpListener::bind(addr).await.expect("failed to bind");
+    let listener = TcpListener::bind(addr)
+        .await
+        .map_err(log_startup_error("failed to bind listener"))?;
+
     axum::serve(listener, app)
         .with_graceful_shutdown(shutdown_signal())
         .await
-        .expect("server error");
+        .map_err(log_startup_error("server error"))?;
+
+    Ok(())
+}
+
+fn log_startup_error<E>(message: &'static str) -> impl FnOnce(E) -> Box<dyn Error + Send + Sync>
+where
+    E: Error + Send + Sync + 'static,
+{
+    move |error| {
+        tracing::error!(error = %error, "{message}");
+        Box::new(error)
+    }
 }
 
 async fn shutdown_signal() {
     let ctrl_c = tokio::signal::ctrl_c();
-    let mut sigterm = tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())
-        .expect("failed to install SIGTERM handler");
+    let mut sigterm = match tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())
+    {
+        Ok(sigterm) => sigterm,
+        Err(error) => {
+            tracing::error!(error = %error, "failed to install SIGTERM handler");
+            return;
+        }
+    };
 
     tokio::select! {
         _ = ctrl_c => tracing::info!("received SIGINT, shutting down"),

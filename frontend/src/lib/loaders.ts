@@ -8,6 +8,7 @@ export async function requireUser(): Promise<SessionUser> {
 
   if (result.error.status === 401) throw redirect("/");
 
+  console.error("[loader] requireUser failed", result.error);
   throw new Response(result.error.message, { status: result.error.status });
 }
 
@@ -16,5 +17,6 @@ export async function optionalUser(): Promise<SessionUser | null> {
 
   if (result.isOk()) return result.value;
 
+  console.error("[loader] optionalUser failed", result.error);
   throw new Response(result.error.message, { status: result.error.status });
 }
