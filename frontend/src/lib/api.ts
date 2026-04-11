@@ -5,7 +5,6 @@ export interface SessionUser {
   id: string;
   name: string;
   is_anon: boolean;
-  prev_anon_user_ids?: string[];
 }
 
 export interface ApiError {

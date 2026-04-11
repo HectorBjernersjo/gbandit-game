@@ -10,8 +10,6 @@ pub struct SessionUser {
     pub id: String,
     pub name: String,
     pub is_anon: bool,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub prev_anon_user_ids: Vec<String>,
 }
 
 impl<S> FromRequestParts<S> for SessionUser
@@ -32,7 +30,6 @@ where
             id: auth_user.claims.sub,
             name: auth_user.claims.name.unwrap_or_else(|| "Player".into()),
             is_anon: auth_user.claims.is_anon,
-            prev_anon_user_ids: vec![],
         })
     }
 }

@@ -1,62 +1,33 @@
 ## Running the project
-The project is already running you can find it on the following urls:
-Frontend: http://${GAME_SLUG}.gbandit.localhost:${INFRA_PORT}
-Backend (Rust): http://${GAME_SLUG}.gbandit.localhost:${INFRA_PORT}/api (via gateway)
-Database (PostgreSQL): localhost:${DB_PORT}
 
-Everything runs in docker. There is no hot reload — after making changes, rebuild with the scripts below.
-Never use raw bun, cargo, or docker compose commands directly. Always use the provided scripts.
+Frontend: http://${GAME_SLUG}.gbandit.localhost (via gateway)
+Backend: http://${GAME_SLUG}.gbandit.localhost/api (via gateway)
+Database: localhost:5432
 
-## Commands
-To rebuild and restart a service:
+## Building and deploying
+
+Never build or bundle the project locally using commands like `cargo build` or `bun run dev`. All building and deploying is handled remotely by the gbandit platform.
+
+Always use the `gbandit` CLI to deploy:
 ```bash
-./scripts/rebuild.sh backend # also runs migrations
-./scripts/rebuild.sh frontend
+gbandit deploy backend
+gbandit deploy frontend
 ```
 
-To run cargo commands (runs migrations first):
+Other useful CLI commands:
 ```bash
-./scripts/cargo.sh test              # run all tests
-./scripts/cargo.sh test test_name    # run a specific test
-./scripts/cargo.sh add some-crate    # add a dependency
-```
-
-To run bun commands:
-```bash
-./scripts/bun.sh add some-package    # add a dependency
-./scripts/bun.sh remove some-package # remove a dependency
-```
-
-For docker compose commands (logs, ps, etc.):
-```bash
-./scripts/dc.sh logs --timestamps
-./scripts/dc.sh logs backend --timestamps
-./scripts/dc.sh logs frontend --timestamps
-./scripts/dc.sh ps
-```
-
-If you need to restart the game from scratch:
-```bash
-./scripts/init.sh
-```
-
-To run queries directly on the db:
-```
-./scripts/psql.sh -c "{ for example select * from users }"
+gbandit logs backend
+gbandit logs frontend
+gbandit sql "SELECT ..."
 ```
 
 ## Testing authenticated endpoints
 - You can sign in to the frontend with ai@gbandit.se / TjabbaTjena999!
-- In dev, you can skip the full OAuth flow and test backend endpoints directly with curl using the `X-Auth-Dev` header.
-  Pass a user ID (integer) and you'll be authenticated as that user:
-  ```bash
-  curl -H "X-Auth-Dev: 2" http://${GAME_SLUG}.gbandit.localhost:${INFRA_PORT}/api/me
-  ```
-- User ID 2 is ai@gbandit.se
 
 ## Good to know
-- User identity is owned by the auth service (infra repo). Game backends receive a user_id from the gateway via `X-Gbandit-*` headers and never manage users directly.
-- When investigating an issue, it can be a good idea to add console logs to identify the problem
+- User identity is owned by the auth service (infra repo). Game backends validate JWT bearer tokens against the auth JWKS and never manage users directly.
+- The browser keeps a shared auth session (cookies). The frontend mints short-lived JWTs from the auth service, and the backend validates them.
+- When investigating an issue, it can be a good idea to add console logs to identify the problem.
 
 ## Rules
 - Always use neverthrow to handle errors, never let the code throw, wrap functions that can throw like fetch, still do console.error to log errors.

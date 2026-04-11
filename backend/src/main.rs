@@ -6,8 +6,7 @@ use basegame_api::{AppState, app, auth::AuthVerifier, config::Config};
 
 #[tokio::main]
 async fn main() {
-    let _ = dotenvy::from_filename("../.env");
-    println!("Heeejaar");
+    let _ = dotenvy::dotenv();
 
     tracing_subscriber::fmt()
         .with_env_filter(
