@@ -1,0 +1,2 @@
+database:
+  image: ghcr.io/cloudnative-pg/postgresql:17

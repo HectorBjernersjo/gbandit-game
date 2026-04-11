@@ -1,10 +1,11 @@
+import { getAccessToken } from "@/lib/auth";
 import { ResultAsync, errAsync } from "neverthrow";
 
 export interface SessionUser {
-  id: number;
+  id: string;
   name: string;
   is_anon: boolean;
-  prev_anon_user_ids?: number[];
+  prev_anon_user_ids?: string[];
 }
 
 export interface ApiError {
@@ -13,36 +14,8 @@ export interface ApiError {
   path: string;
 }
 
-// Dedup concurrent refresh attempts — all 401 retries share one in-flight refresh.
-let refreshPromise: Promise<boolean> | null = null;
-
 function logApiError(message: string, details: Record<string, unknown>) {
   console.error(`[api] ${message}`, details);
-}
-
-function tryRefresh(): Promise<boolean> {
-  if (refreshPromise) return refreshPromise;
-
-  refreshPromise = fetch("/auth/refresh")
-    .then((res) => {
-      if (!res.ok) {
-        logApiError("session refresh failed", { path: "/auth/refresh", status: res.status });
-      }
-
-      return res.ok;
-    })
-    .catch((error) => {
-      logApiError("session refresh request failed", {
-        path: "/auth/refresh",
-        error: String(error),
-      });
-      return false;
-    })
-    .finally(() => {
-      refreshPromise = null;
-    });
-
-  return refreshPromise;
 }
 
 function rawFetch<T>(path: string, init?: RequestInit): ResultAsync<T, ApiError> {
@@ -84,20 +57,36 @@ function rawFetch<T>(path: string, init?: RequestInit): ResultAsync<T, ApiError>
   });
 }
 
-function apiFetch<T>(path: string, init?: RequestInit): ResultAsync<T, ApiError> {
-  return rawFetch<T>(path, init).orElse((error) => {
-    if (error.status !== 401) return errAsync(error);
+function withBearer(init: RequestInit | undefined, token: string): RequestInit {
+  const headers = new Headers(init?.headers ?? {});
+  headers.set("authorization", `Bearer ${token}`);
 
-    // 401 — try refreshing the session, then retry once
-    return ResultAsync.fromSafePromise(tryRefresh()).andThen((ok) => {
-      if (!ok) return errAsync(error);
-      return rawFetch<T>(path, init);
-    });
+  return {
+    ...init,
+    headers,
+  };
+}
+
+function apiFetchWithToken<T>(
+  path: string,
+  init?: RequestInit,
+  forceRefresh = false,
+): ResultAsync<T, ApiError> {
+  return ResultAsync.fromPromise(getAccessToken(forceRefresh), (error): ApiError => ({
+    status: 401,
+    message: String(error),
+    path,
+  })).andThen((token) => {
+    if (!token) return errAsync<T, ApiError>({ status: 401, message: "not authenticated", path });
+    return rawFetch<T>(path, withBearer(init, token));
   });
 }
 
 export function getMe(): ResultAsync<SessionUser, ApiError> {
-  return apiFetch<SessionUser>("/api/me");
+  return apiFetchWithToken<SessionUser>("/api/me").orElse((error) => {
+    if (error.status !== 401) return errAsync(error);
+    return apiFetchWithToken<SessionUser>("/api/me", undefined, true);
+  });
 }
 
 export function getOptionalMe(): ResultAsync<SessionUser | null, ApiError> {

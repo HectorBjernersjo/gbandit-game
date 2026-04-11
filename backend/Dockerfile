@@ -8,11 +8,9 @@ COPY Cargo.toml Cargo.lock ./
 
 # Copy source code, sqlx cache, and migrations (sqlx::migrate! embeds these at compile time)
 COPY src ./src
-COPY .sqlx ./.sqlx
 COPY migrations ./migrations
 
 # Build for release (use .sqlx cache, no live DB needed)
-ENV SQLX_OFFLINE=true
 RUN cargo build --release
 
 # Runtime stage

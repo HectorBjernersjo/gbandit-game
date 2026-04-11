@@ -33,7 +33,7 @@ This repo uses a rebuild-and-redeploy workflow in development. After changing co
 
 - This is a **game repo**. It depends on the shared infra (auth, gateway, me) running separately.
 - The gateway routes `{slug}.gbandit.localhost` to this game's backend/frontend via Docker DNS on the shared `gbandit-net` network.
-- Auth is handled by the infra gateway — backends receive user identity via signed `X-Gbandit-*` headers. Games never manage users directly.
+- Auth now matches the Kubernetes platform model: the browser keeps the shared auth session, the frontend mints short-lived JWTs from `auth-service`, and the backend validates bearer tokens against the auth JWKS.
 - There is no hot reload. Source changes do nothing until you rebuild the affected service.
 - Long-running app services are managed through Docker Compose via `./scripts/init.sh` and `./scripts/rebuild.sh`. Do not use ad hoc `cargo run` for the backend in this repo.
 

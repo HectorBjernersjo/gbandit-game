@@ -32,8 +32,11 @@ services:
       db:
         condition: service_healthy
     environment:
+      LISTEN_ADDR: 0.0.0.0:80
       DATABASE_URL: postgres://${PGUSER}:${PGPASSWORD}@${GAME_SLUG}-db:5432/${PGDATABASE}?sslmode=disable
-      SIGNING_PUBLIC_KEY: ${SIGNING_PUBLIC_KEY}
+      AUTH_ISSUER: ${AUTH_ISSUER}
+      AUTH_AUDIENCE: ${AUTH_AUDIENCE}
+      AUTH_JWKS_URL: ${AUTH_JWKS_URL}
     networks:
       gbandit-net:
         aliases:

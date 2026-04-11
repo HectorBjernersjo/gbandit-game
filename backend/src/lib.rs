@@ -1,10 +1,10 @@
+pub mod auth;
 pub mod config;
 pub mod db;
 pub mod errors;
 pub mod extractors;
 pub mod models;
 pub mod routes;
-pub mod sig;
 
 use axum::Router;
 use axum::http::StatusCode;
@@ -13,12 +13,14 @@ use axum::routing::get;
 use sqlx::PgPool;
 use tower_http::trace::TraceLayer;
 
+use auth::{AuthVerifier, HasAuthVerifier};
 use config::Config;
 
 #[derive(Clone)]
 pub struct AppState {
     pub pool: PgPool,
     pub config: Config,
+    pub auth_verifier: AuthVerifier,
 }
 
 impl axum::extract::FromRef<AppState> for PgPool {
@@ -30,6 +32,12 @@ impl axum::extract::FromRef<AppState> for PgPool {
 impl axum::extract::FromRef<AppState> for Config {
     fn from_ref(state: &AppState) -> Self {
         state.config.clone()
+    }
+}
+
+impl HasAuthVerifier for AppState {
+    fn auth_verifier(&self) -> &AuthVerifier {
+        &self.auth_verifier
     }
 }
 

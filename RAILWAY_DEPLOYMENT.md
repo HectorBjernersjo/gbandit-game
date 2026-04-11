@@ -33,7 +33,9 @@ Click on the backend service → **Variables**:
 
 ```
 DATABASE_URL=<select the right database url>
-SIGNING_PUBLIC_KEY=<pick from the shared variables>
+AUTH_ISSUER=https://auth.gbandit.com
+AUTH_AUDIENCE=game-backend
+AUTH_JWKS_URL=https://auth.gbandit.com/.well-known/jwks.json
 ```
 
 ### 5. Configure Frontend
