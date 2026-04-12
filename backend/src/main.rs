@@ -6,7 +6,6 @@ use basegame_api::{AppState, app, auth::AuthVerifier, config::Config};
 
 #[tokio::main]
 async fn main() {
-    println!("heej");
     let _ = dotenvy::dotenv();
 
     tracing_subscriber::fmt()
