@@ -1,9 +1,10 @@
+import { GAME_NAME } from "@/config";
 import { loginUrl, guestUrl } from "@/lib/auth";
 
 export function HomeLoggedOut() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-6">
-      <h1 className="text-4xl font-bold">Basegame</h1>
+      <h1 className="text-4xl font-bold">{GAME_NAME}</h1>
       <p className="text-lg text-foreground/60">
         Sign in to get started, or try it out first.
       </p>

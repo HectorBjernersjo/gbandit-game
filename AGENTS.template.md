@@ -21,6 +21,8 @@ gbandit logs frontend
 gbandit sql "SELECT ..."
 ```
 
+The gbandit cli by default targets the dev environment, if you want to target stage or prod, use --environment <stage/prod>
+
 ## Testing authenticated endpoints
 - You can sign in to the frontend with ai@gbandit.se / TjabbaTjena999!
 

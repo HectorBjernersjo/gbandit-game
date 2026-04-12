@@ -6,6 +6,7 @@ use basegame_api::{AppState, app, auth::AuthVerifier, config::Config};
 
 #[tokio::main]
 async fn main() {
+    println!("heej");
     let _ = dotenvy::dotenv();
 
     tracing_subscriber::fmt()
@@ -31,23 +32,16 @@ async fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
         config.auth_jwks_refresh_interval,
     )
     .await
-    .map_err(|error| {
+    .map_err(|error| -> Box<dyn Error + Send + Sync> {
         tracing::error!(jwks_url = %config.auth_jwks_url, error = %error, "failed to initialize auth verifier");
-        std::io::Error::other(error)
-    })
-    .map_err(log_startup_error("failed to initialize auth verifier"))?;
+        Box::new(std::io::Error::other(error))
+    })?;
 
     let pool = PgPoolOptions::new()
         .max_connections(10)
         .connect(&config.database_url)
         .await
         .map_err(log_startup_error("failed to connect to database"))?;
-
-    tracing::info!("running database migrations");
-    sqlx::migrate!("./migrations")
-        .run(&pool)
-        .await
-        .map_err(log_startup_error("failed to run migrations"))?;
 
     let state = AppState {
         pool,

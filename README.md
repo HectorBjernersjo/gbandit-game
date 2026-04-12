@@ -13,7 +13,7 @@ A game built on the gbandit platform. Rust/Axum backend, React/Vite frontend, Po
 ## Quick Start
 
 ```bash
-# Start backend (runs migrations automatically)
+# Start backend
 cd backend
 cargo run
 
@@ -31,12 +31,3 @@ The game is accessible at the URL routed through the infra gateway.
 - The gateway routes `{slug}.gbandit.localhost` to this game's backend/frontend.
 - The browser keeps a shared auth session. The frontend mints short-lived JWTs from the auth service, and the backend validates bearer tokens against the auth JWKS.
 
-## Creating a Migration
-
-```bash
-cd backend
-sqlx migrate add -r your_migration_name
-# Edit the generated files in migrations/
-```
-
-Migrations run automatically on backend startup.

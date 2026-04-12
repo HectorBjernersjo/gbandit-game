@@ -54,6 +54,7 @@ pub fn app(state: AppState) -> Router {
         .route("/api/me", get(routes::me::get_me))
         .fallback(fallback)
         .layer(TraceLayer::new_for_http())
+        // Health is below the trace layer so probe traffic doesn't fill the logs
         .route("/api/health", get(routes::health::health))
         .with_state(state)
 }

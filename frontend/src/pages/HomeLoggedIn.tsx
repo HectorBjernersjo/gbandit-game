@@ -1,3 +1,4 @@
+import { GAME_NAME } from "@/config";
 import { loginUrl } from "@/lib/auth";
 import { useUser } from "@/lib/auth-context";
 import { SignOutButton } from "@/components/SignOutButton";
@@ -7,7 +8,7 @@ export function HomeLoggedIn() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-6">
-      <h1 className="text-3xl font-bold">Basegame</h1>
+      <h1 className="text-3xl font-bold">{GAME_NAME}</h1>
 
       {user.is_anon && (
         <div className="rounded-lg border border-foreground/20 bg-foreground/5 px-4 py-3 text-sm w-full max-w-md text-center">
@@ -23,6 +24,9 @@ export function HomeLoggedIn() {
       )}
 
       <div className="rounded-xl border border-foreground/10 p-6 w-full max-w-md space-y-3">
+        <p>
+          Sup
+        </p>
         <p>
           <span className="font-medium">Name:</span> {user.name}
         </p>

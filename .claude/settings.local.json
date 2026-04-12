@@ -51,7 +51,8 @@
       "Bash(./scripts/psql.sh:*)",
       "Bash(./scripts/bun.sh:*)",
       "Bash(./scripts/cargo.sh:*)",
-      "Bash(./scripts/dc.sh down:*)"
+      "Bash(./scripts/dc.sh down:*)",
+      "Bash(grep:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

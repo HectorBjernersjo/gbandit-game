@@ -6,9 +6,8 @@ WORKDIR /app
 # Copy manifests
 COPY Cargo.toml Cargo.lock ./
 
-# Copy source code, sqlx cache, and migrations (sqlx::migrate! embeds these at compile time)
+# Copy source code and sqlx cache
 COPY src ./src
-COPY migrations ./migrations
 
 # Build for release (use .sqlx cache, no live DB needed)
 RUN cargo build --release
