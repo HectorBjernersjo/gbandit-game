@@ -25,7 +25,7 @@ export function HomeLoggedIn() {
 
       <div className="rounded-xl border border-foreground/10 p-6 w-full max-w-md space-y-3">
         <p>
-          Sup
+          Supa
         </p>
         <p>
           <span className="font-medium">Name:</span> {user.name}

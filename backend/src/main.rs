@@ -6,6 +6,7 @@ use basegame_api::{AppState, app, auth::AuthVerifier, config::Config};
 
 #[tokio::main]
 async fn main() {
+    println!("hojhojhoja");
     let _ = dotenvy::dotenv();
 
     tracing_subscriber::fmt()
@@ -52,7 +53,7 @@ async fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
 
     let addr = config.listen_addr;
 
-    tracing::info!("listening on {addr}");
+    tracing::info!("listening on {addr} (v9)");
 
     let listener = TcpListener::bind(addr)
         .await
