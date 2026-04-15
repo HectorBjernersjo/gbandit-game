@@ -6,12 +6,16 @@ pub mod extractors;
 pub mod models;
 pub mod routes;
 
+use std::time::Instant;
+
 use axum::Router;
+use axum::body::Body;
+use axum::extract::Request;
 use axum::http::StatusCode;
-use axum::response::IntoResponse;
+use axum::middleware::{self, Next};
+use axum::response::{IntoResponse, Response};
 use axum::routing::get;
 use sqlx::PgPool;
-use tower_http::trace::TraceLayer;
 
 use auth::{AuthVerifier, HasAuthVerifier};
 use config::Config;
@@ -53,8 +57,19 @@ pub fn app(state: AppState) -> Router {
         .route("/", get(|| async { "running" }))
         .route("/api/me", get(routes::me::get_me))
         .fallback(fallback)
-        .layer(TraceLayer::new_for_http())
-        // Health is below the trace layer so probe traffic doesn't fill the logs
+        .layer(middleware::from_fn(log_request))
+        // Health is below the request-log middleware so probe traffic doesn't fill the logs.
         .route("/api/health", get(routes::health::health))
         .with_state(state)
+}
+
+async fn log_request(req: Request<Body>, next: Next) -> Response {
+    let method = req.method().clone();
+    let uri = req.uri().clone();
+    let start = Instant::now();
+    let resp = next.run(req).await;
+    let latency_ms = start.elapsed().as_millis();
+    let status = resp.status().as_u16();
+    tracing::info!(%method, %uri, status, latency_ms, "response");
+    resp
 }
