@@ -1,33 +1,31 @@
 ## Running the project
 
-Frontend: http://${GAME_SLUG}.gbandit.localhost (via gateway)
-Backend: http://${GAME_SLUG}.gbandit.localhost/api (via gateway)
-Database: localhost:5432
+Frontend: http://GAME_SLUG.gbandit.com
+Backend: http://GAME_SLUG.gbandit.com/api
 
 ## Building and deploying
 
 Never build or bundle the project locally using commands like `cargo build` or `bun run dev`. All building and deploying is handled remotely by the gbandit platform.
 
-Always use the `gbandit` CLI to deploy:
+Always use the `gbandit` CLI to build and deploy:
 ```bash
-gbandit deploy backend
-gbandit deploy frontend
+gbandit deploy [frontend|backend]
 ```
 
 Other useful CLI commands:
 ```bash
-gbandit logs backend
-gbandit logs frontend
+gbandit logs [frontend|backend]
 gbandit sql "SELECT ..."
+gbandit env [set|list|delete]
 ```
 
-The gbandit cli by default targets the dev environment, if you want to target stage or prod, use --environment <stage/prod>
+The gbandit cli by default targets the dev environment, if you want to target stage or prod, use --environment [stage|prod]
 
 ## Testing authenticated endpoints
 - You can sign in to the frontend with ai@gbandit.se / TjabbaTjena999!
 
 ## Good to know
-- User identity is owned by the auth service (infra repo). Game backends validate JWT bearer tokens against the auth JWKS and never manage users directly.
+- Auth is handled by an external service. Game backends validate JWT bearer tokens against the auth JWKS and never manage users directly.
 - The browser keeps a shared auth session (cookies). The frontend mints short-lived JWTs from the auth service, and the backend validates them.
 - When investigating an issue, it can be a good idea to add console logs to identify the problem.
 
