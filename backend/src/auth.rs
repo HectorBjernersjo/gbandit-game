@@ -166,6 +166,27 @@ pub trait HasAuthVerifier {
     fn auth_verifier(&self) -> &AuthVerifier;
 }
 
+#[cfg(debug_assertions)]
+fn dev_user(name: &str) -> Option<AccessTokenClaims> {
+    let (sub, email) = match name.to_lowercase().as_str() {
+        "eric" => ("dev-eric", "eric@dev.local"),
+        "anna" => ("dev-anna", "anna@dev.local"),
+        "steve" => ("dev-steve", "steve@dev.local"),
+        _ => return None,
+    };
+    Some(AccessTokenClaims {
+        iss: "dev".into(),
+        sub: sub.into(),
+        aud: "game-backend".into(),
+        exp: i64::MAX,
+        iat: 0,
+        jti: format!("dev-{sub}"),
+        name: Some(name.to_lowercase()),
+        email: Some(email.into()),
+        is_anon: false,
+    })
+}
+
 #[derive(Debug, Clone)]
 pub struct AuthenticatedUser {
     pub claims: AccessTokenClaims,
@@ -178,6 +199,15 @@ where
     type Rejection = (StatusCode, String);
 
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
+        #[cfg(debug_assertions)]
+        if let Some(name) = parts.headers.get("x-dev-user").and_then(|v| v.to_str().ok()) {
+            let claims = dev_user(name).ok_or_else(|| {
+                (StatusCode::BAD_REQUEST, format!("unknown dev user: {name}"))
+            })?;
+            tracing::debug!(user = name, "using dev auth bypass");
+            return Ok(Self { claims });
+        }
+
         let auth_header = parts
             .headers
             .get(AUTHORIZATION)

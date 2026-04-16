@@ -21,11 +21,16 @@ gbandit env [set|list|delete]
 
 The gbandit cli by default targets the dev environment, if you want to target stage or prod, use --environment [stage|prod]
 
+## Migrations
+Migrations are applied automatically when deploying the backend.
+DATABASE_URL is provided when building so you don't need to worry about sqlx in any way.
+
 ## Testing authenticated endpoints
 - You can sign in to the frontend with ai@gbandit.se / TjabbaTjena999!
+- In debug builds, send `X-Dev-User: eric` (or `anna`/`steve`) to bypass auth.
 
 ## Good to know
-- Auth is handled by an external service. Game backends validate JWT bearer tokens against the auth JWKS and never manage users directly.
+- Auth is handled by auth.gbandit.com. // something more here
 - The browser keeps a shared auth session (cookies). The frontend mints short-lived JWTs from the auth service, and the backend validates them.
 - When investigating an issue, it can be a good idea to add console logs to identify the problem.
 

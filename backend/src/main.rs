@@ -19,7 +19,6 @@ impl FormatTime for SecondsUtc {
 
 #[tokio::main]
 async fn main() {
-    println!("hojhojhoja");
     let _ = dotenvy::dotenv();
 
     tracing_subscriber::fmt()
@@ -67,7 +66,7 @@ async fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
 
     let addr = config.listen_addr;
 
-    tracing::info!("listening on {addr} (v9)");
+    tracing::info!("listening on {addr}");
 
     let listener = TcpListener::bind(addr)
         .await
