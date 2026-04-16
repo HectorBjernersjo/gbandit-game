@@ -30,13 +30,13 @@ The gbandit cli by default targets the dev environment, if you want to target st
 - When investigating an issue, it can be a good idea to add console logs to identify the problem.
 
 ## Rules
-- Always use neverthrow to handle errors, never let the code throw, wrap functions that can throw like fetch, still do console.error to log errors.
+- Only use try catch when you explicity expect there to be an error and you want to handle it. Never to "prevent bugs".
 - When encountering an issue, focus on addressing the root cause rather than treating the symptoms.
     - It's acceptable—and often preferable—to make a larger refactor instead of applying a quick fix, as you are responsible for the long-term maintainability of the codebase.
     - If the problem arises because another part of the system behaves differently than expected when you try to use it, treat this as a potential sign of poor design, unclear contracts, or missing abstractions, and consider whether that part should be refactored or reworked.
 - When you find something that should be fixed, wether that is a bug, some technical debt, a warning, or just something that could make development easier:
     - If it's small or hindering your current task, just fix it immediately
-    - Otherwise add it to tasks/TODO.md
+    - Otherwise add it to TODO.md
 
 ## Plan Mode
 - Make the plan very concise. Sacrifice grammar for the sake of concision.

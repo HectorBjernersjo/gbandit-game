@@ -1,22 +1,23 @@
 import { redirect } from "react-router";
-import { getMe, getOptionalMe, type SessionUser } from "@/lib/api";
+import { ApiError, getMe, getOptionalMe, type SessionUser } from "@/lib/api";
 
 export async function requireUser(): Promise<SessionUser> {
-  const result = await getMe();
-
-  if (result.isOk()) return result.value;
-
-  if (result.error.status === 401) throw redirect("/");
-
-  console.error("[loader] requireUser failed", result.error);
-  throw new Response(result.error.message, { status: result.error.status });
+  try {
+    return await getMe();
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 401) throw redirect("/");
+    console.error("[loader] requireUser failed", error);
+    if (error instanceof ApiError) throw new Response(error.message, { status: error.status });
+    throw error;
+  }
 }
 
 export async function optionalUser(): Promise<SessionUser | null> {
-  const result = await getOptionalMe();
-
-  if (result.isOk()) return result.value;
-
-  console.error("[loader] optionalUser failed", result.error);
-  throw new Response(result.error.message, { status: result.error.status });
+  try {
+    return await getOptionalMe();
+  } catch (error) {
+    console.error("[loader] optionalUser failed", error);
+    if (error instanceof ApiError) throw new Response(error.message, { status: error.status });
+    throw error;
+  }
 }
