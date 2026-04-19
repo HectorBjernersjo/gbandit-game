@@ -1,8 +1,19 @@
 use axum::Json;
+use serde::Serialize;
 
-use crate::errors::AppError;
-use crate::extractors::SessionUser;
+use crate::auth::AuthenticatedUser;
 
-pub async fn get_me(user: SessionUser) -> Result<Json<SessionUser>, AppError> {
-    Ok(Json(user))
+#[derive(Debug, Serialize)]
+pub struct MeResponse {
+    pub id: String,
+    pub name: String,
+    pub is_anon: bool,
+}
+
+pub async fn get_me(user: AuthenticatedUser) -> Json<MeResponse> {
+    Json(MeResponse {
+        id: user.id().to_string(),
+        name: user.name().to_string(),
+        is_anon: user.is_anon(),
+    })
 }

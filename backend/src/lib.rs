@@ -2,7 +2,6 @@ pub mod auth;
 pub mod config;
 pub mod db;
 pub mod errors;
-pub mod extractors;
 pub mod models;
 pub mod routes;
 
@@ -11,14 +10,14 @@ use std::time::Instant;
 use axum::Router;
 use axum::body::Body;
 use axum::extract::Request;
-use axum::http::StatusCode;
 use axum::middleware::{self, Next};
-use axum::response::{IntoResponse, Response};
+use axum::response::Response;
 use axum::routing::get;
 use sqlx::PgPool;
 
-use auth::{AuthVerifier, HasAuthVerifier};
+use auth::AuthVerifier;
 use config::Config;
+use errors::AppError;
 
 #[derive(Clone)]
 pub struct AppState {
@@ -39,17 +38,8 @@ impl axum::extract::FromRef<AppState> for Config {
     }
 }
 
-impl HasAuthVerifier for AppState {
-    fn auth_verifier(&self) -> &AuthVerifier {
-        &self.auth_verifier
-    }
-}
-
-async fn fallback() -> impl IntoResponse {
-    (
-        StatusCode::NOT_FOUND,
-        axum::Json(serde_json::json!({ "error": "not found" })),
-    )
+async fn fallback() -> AppError {
+    AppError::NotFound
 }
 
 pub fn app(state: AppState) -> Router {

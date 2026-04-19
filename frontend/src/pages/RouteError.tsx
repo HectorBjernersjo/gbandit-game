@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { isRouteErrorResponse, useRouteError } from "react-router";
-import { SignOutButton } from "@/components/SignOutButton";
 
 export function RouteError() {
   const error = useRouteError();
@@ -22,9 +21,14 @@ export function RouteError() {
     <main className="flex min-h-screen flex-col items-center justify-center gap-6">
       <h1 className="text-3xl font-bold">Something went wrong</h1>
       <p className="text-foreground/60">
-        We couldn&apos;t load your account. Please try again later.
+        We couldn&apos;t load this page. Please try again.
       </p>
-      <SignOutButton />
+      <button
+        onClick={() => window.location.reload()}
+        className="rounded-lg border border-foreground/20 px-4 py-2 text-sm hover:bg-foreground/5 transition-colors"
+      >
+        Try again
+      </button>
     </main>
   );
 }

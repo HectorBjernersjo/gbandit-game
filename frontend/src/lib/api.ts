@@ -53,32 +53,32 @@ function withBearer(init: RequestInit | undefined, token: string): RequestInit {
     };
 }
 
-async function apiFetchWithToken<T>(
-    path: string,
-    init?: RequestInit,
-    forceRefresh = false,
-): Promise<T> {
-    let token: string | null;
+async function apiFetchWithToken<T>(path: string, init?: RequestInit): Promise<T> {
+    const fetchOnce = async (forceRefresh: boolean): Promise<T> => {
+        let token: string | null;
+        try {
+            token = await getAccessToken(forceRefresh);
+        } catch (error) {
+            throw new ApiError(401, String(error), path);
+        }
+        if (!token) throw new ApiError(401, "not authenticated", path);
+        return rawFetch<T>(path, withBearer(init, token));
+    };
+
     try {
-        token = await getAccessToken(forceRefresh);
+        return await fetchOnce(false);
     } catch (error) {
-        throw new ApiError(401, String(error), path);
-    }
-
-    if (!token) throw new ApiError(401, "not authenticated", path);
-
-    return rawFetch<T>(path, withBearer(init, token));
-}
-
-export async function getMe(): Promise<SessionUser> {
-    try {
-        return await apiFetchWithToken<SessionUser>("/api/me");
-    } catch (error) {
+        // A cached token may still validate locally but be rejected by the server
+        // (clock skew, JWKS rotation). Retry once with a forced refresh.
         if (error instanceof ApiError && error.status === 401) {
-            return apiFetchWithToken<SessionUser>("/api/me", undefined, true);
+            return fetchOnce(true);
         }
         throw error;
     }
+}
+
+export async function getMe(): Promise<SessionUser> {
+    return apiFetchWithToken<SessionUser>("/api/me");
 }
 
 export async function getOptionalMe(): Promise<SessionUser | null> {

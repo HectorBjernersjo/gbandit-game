@@ -1,16 +1,7 @@
 import { getAccessToken } from "@/lib/auth";
+import { gbanditOrigin } from "@/lib/gbandit";
 
-function ingestUrl(): string {
-  const { protocol, hostname } = window.location;
-  const isLocal =
-    hostname === "localhost" ||
-    hostname === "127.0.0.1" ||
-    hostname.endsWith(".localhost");
-  const base = isLocal ? "gbandit.localhost" : "gbandit.com";
-  return `${protocol}//platform.${base}/api/ingest/frontend-logs`;
-}
-
-const INGEST_URL = ingestUrl();
+const INGEST_URL = `${gbanditOrigin("platform")}/api/ingest/frontend-logs`;
 // Cap per request so a runaway error loop doesn't produce an enormous payload.
 const MAX_BATCH_SIZE = 20;
 

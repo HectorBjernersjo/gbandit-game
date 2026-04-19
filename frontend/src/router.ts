@@ -8,20 +8,23 @@ import { Spinner } from "@/components/Spinner";
 
 export const router = createBrowserRouter([
   {
-    path: "/",
-    loader: optionalUser,
-    Component: Home,
-    HydrateFallback: Spinner,
-  },
-  {
-    loader: requireUser,
-    Component: AuthLayout,
     ErrorBoundary: RouteError,
     HydrateFallback: Spinner,
-    children: [],
-  },
-  {
-    path: "*",
-    Component: NotFound,
+    children: [
+      {
+        path: "/",
+        loader: optionalUser,
+        Component: Home,
+      },
+      {
+        loader: requireUser,
+        Component: AuthLayout,
+        children: [],
+      },
+      {
+        path: "*",
+        Component: NotFound,
+      },
+    ],
   },
 ]);

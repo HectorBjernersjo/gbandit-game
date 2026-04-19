@@ -1,5 +1,4 @@
 use axum::extract::FromRequestParts;
-use axum::http::StatusCode;
 use axum::http::header::AUTHORIZATION;
 use axum::http::request::Parts;
 use jsonwebtoken::{Algorithm, DecodingKey, Validation, decode, decode_header, jwk::JwkSet};
@@ -7,6 +6,9 @@ use serde::{Deserialize, Serialize};
 use std::sync::{Arc, RwLock};
 use std::time::Duration;
 use tokio::time::sleep;
+
+use crate::AppState;
+use crate::errors::AppError;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AccessTokenClaims {
@@ -162,10 +164,6 @@ async fn fetch_jwks_keys(
     Ok(keys)
 }
 
-pub trait HasAuthVerifier {
-    fn auth_verifier(&self) -> &AuthVerifier;
-}
-
 #[cfg(debug_assertions)]
 fn dev_user(name: &str) -> Option<AccessTokenClaims> {
     let (sub, email) = match name.to_lowercase().as_str() {
@@ -192,18 +190,28 @@ pub struct AuthenticatedUser {
     pub claims: AccessTokenClaims,
 }
 
-impl<S> FromRequestParts<S> for AuthenticatedUser
-where
-    S: Send + Sync + HasAuthVerifier,
-{
-    type Rejection = (StatusCode, String);
+impl AuthenticatedUser {
+    pub fn id(&self) -> &str {
+        &self.claims.sub
+    }
 
-    async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
+    pub fn name(&self) -> &str {
+        self.claims.name.as_deref().unwrap_or("Player")
+    }
+
+    pub fn is_anon(&self) -> bool {
+        self.claims.is_anon
+    }
+}
+
+impl FromRequestParts<AppState> for AuthenticatedUser {
+    type Rejection = AppError;
+
+    async fn from_request_parts(parts: &mut Parts, state: &AppState) -> Result<Self, Self::Rejection> {
         #[cfg(debug_assertions)]
         if let Some(name) = parts.headers.get("x-dev-user").and_then(|v| v.to_str().ok()) {
-            let claims = dev_user(name).ok_or_else(|| {
-                (StatusCode::BAD_REQUEST, format!("unknown dev user: {name}"))
-            })?;
+            let claims = dev_user(name)
+                .ok_or_else(|| AppError::BadRequest(format!("unknown dev user: {name}")))?;
             tracing::debug!(user = name, "using dev auth bypass");
             return Ok(Self { claims });
         }
@@ -212,22 +220,19 @@ where
             .headers
             .get(AUTHORIZATION)
             .and_then(|value| value.to_str().ok())
-            .ok_or_else(|| (StatusCode::UNAUTHORIZED, "missing authorization header".into()))?;
+            .ok_or_else(|| AppError::Unauthorized("missing authorization header".into()))?;
 
         let token = auth_header
             .strip_prefix("Bearer ")
             .or_else(|| auth_header.strip_prefix("bearer "))
             .ok_or_else(|| {
-                (
-                    StatusCode::UNAUTHORIZED,
-                    "authorization header must use bearer token".into(),
-                )
+                AppError::Unauthorized("authorization header must use bearer token".into())
             })?;
 
         let claims = state
-            .auth_verifier()
+            .auth_verifier
             .verify(token)
-            .map_err(|err| (StatusCode::UNAUTHORIZED, err))?;
+            .map_err(AppError::Unauthorized)?;
 
         Ok(Self { claims })
     }

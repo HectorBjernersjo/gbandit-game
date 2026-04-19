@@ -1,3 +1,5 @@
+import { gbanditOrigin } from "@/lib/gbandit";
+
 type TokenResponse = {
   access_token: string;
   expires_at: string;
@@ -11,16 +13,8 @@ const tokenState: {
   expiresAt: 0,
 };
 
-function baseDomain(): string {
-  const { hostname } = window.location;
-  if (hostname === "localhost" || hostname === "127.0.0.1" || hostname.endsWith(".localhost")) {
-    return "gbandit.localhost";
-  }
-  return "gbandit.com";
-}
-
 export function authOrigin(): string {
-  return `${window.location.protocol}//auth.${baseDomain()}`;
+  return gbanditOrigin("auth");
 }
 
 export function loginUrl(redirect = window.location.href): string {

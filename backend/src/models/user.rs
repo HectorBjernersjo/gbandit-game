@@ -1,2 +1,2 @@
 // User-related DB models go here.
-// SessionUser (identity from JWT claims) is in extractors.rs.
+// Identity from the JWT is exposed via `auth::AuthenticatedUser`.
