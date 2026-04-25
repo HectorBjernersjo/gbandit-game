@@ -38,12 +38,6 @@ export async function getAccessToken(forceRefresh = false): Promise<string | nul
   const response = await fetch(`${authOrigin()}/api/token`, {
     method: "POST",
     credentials: "include",
-    headers: {
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
-      audience: "game-backend",
-    }),
   });
 
   if (response.status === 401) {

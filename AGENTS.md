@@ -27,14 +27,10 @@ DATABASE_URL is provided when building so you don't need to worry about sqlx in 
 
 ## Testing authenticated endpoints
 - You can sign in to the frontend with ai@gbandit.se / TjabbaTjena999!
-- In debug builds, send `X-Dev-User: eric` (or `anna`/`steve`) to bypass auth.
-
-## Good to know
-- Auth is handled by auth.gbandit.com. // something more here
-- The browser keeps a shared auth session (cookies). The frontend mints short-lived JWTs from the auth service, and the backend validates them.
-- When investigating an issue, it can be a good idea to add console logs to identify the problem.
+- In debug builds, send `X-Dev-User: eric` (or `anna`/`steve`) as a header to bypass auth.
 
 ## Rules
+- When investigating an issue, it is often a good idea to add console logs to identify the problem.
 - Only use try catch when you explicity expect there to be an error and you want to handle it. Never to "prevent bugs".
 - When encountering an issue, focus on addressing the root cause rather than treating the symptoms.
     - It's acceptable—and often preferable—to make a larger refactor instead of applying a quick fix, as you are responsible for the long-term maintainability of the codebase.

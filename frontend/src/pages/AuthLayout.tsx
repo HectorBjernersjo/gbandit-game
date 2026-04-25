@@ -1,5 +1,5 @@
 import { Outlet, useLoaderData } from "react-router";
-import { type SessionUser } from "@/lib/api";
+import { type SessionUser } from "@/api/session";
 import { AuthProvider } from "@/lib/auth-context";
 
 export function AuthLayout() {

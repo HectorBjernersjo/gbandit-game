@@ -1,5 +1,24 @@
 import { redirect } from "react-router";
-import { ApiError, getMe, getOptionalMe, type SessionUser } from "@/lib/api";
+import { ApiError, apiFetchWithToken } from "@/lib/http";
+
+export interface SessionUser {
+  id: string;
+  name: string;
+  is_anon: boolean;
+}
+
+export function getMe(): Promise<SessionUser> {
+  return apiFetchWithToken<SessionUser>("/api/me");
+}
+
+export async function getOptionalMe(): Promise<SessionUser | null> {
+  try {
+    return await getMe();
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 401) return null;
+    throw error;
+  }
+}
 
 export async function requireUser(): Promise<SessionUser> {
   try {

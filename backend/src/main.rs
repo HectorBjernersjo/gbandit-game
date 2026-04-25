@@ -1,28 +1,18 @@
 use sqlx::postgres::PgPoolOptions;
 use std::error::Error;
 use tokio::net::TcpListener;
-use tracing_subscriber::fmt::format::Writer;
-use tracing_subscriber::fmt::time::FormatTime;
 
 use basegame_api::{AppState, app, auth::AuthVerifier, config::Config};
-
-/// Emit timestamps at 1-second resolution. The default subscriber uses
-/// microsecond precision which is noisier than it is useful for an HTTP
-/// request log.
-struct SecondsUtc;
-
-impl FormatTime for SecondsUtc {
-    fn format_time(&self, w: &mut Writer<'_>) -> std::fmt::Result {
-        write!(w, "{}", chrono::Utc::now().format("%Y-%m-%dT%H:%M:%SZ"))
-    }
-}
 
 #[tokio::main]
 async fn main() {
     let _ = dotenvy::dotenv();
 
+    // Kubernetes adds an RFC3339 timestamp prefix to every log line via the
+    // platform's `--timestamps` log fetch, so emit lines without our own
+    // timestamp to avoid duplication in the logs viewer.
     tracing_subscriber::fmt()
-        .with_timer(SecondsUtc)
+        .without_time()
         .with_env_filter(
             tracing_subscriber::EnvFilter::try_from_default_env()
                 .unwrap_or_else(|_| "basegame_api=debug,tower_http=debug".into()),

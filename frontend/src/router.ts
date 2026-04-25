@@ -1,5 +1,5 @@
 import { createBrowserRouter } from "react-router";
-import { optionalUser, requireUser } from "@/lib/loaders";
+import { optionalUser, requireUser } from "@/api/session";
 import { Home } from "@/pages/Home";
 import { AuthLayout } from "@/pages/AuthLayout";
 import { NotFound } from "@/pages/NotFound";
