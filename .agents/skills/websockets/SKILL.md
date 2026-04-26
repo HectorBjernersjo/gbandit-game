@@ -39,7 +39,7 @@ Backend:
 Frontend:
 1. Shared `WebSocketProvider` for one app-level connection
 2. Provider mounted high enough in router to cover all real-time routes
-3. Provider reads the current token from the auth context and passes it as the `bearer` subprotocol on connect/reconnect
+3. Provider calls `getAccessToken()` from `@/lib/auth` at each connect/reconnect and passes the result as the `bearer` subprotocol. Do not cache the token in the provider — `getAccessToken` already handles caching and refresh-before-expiry.
 4. Consumer API exposes `send`, `connected`, `subscribe`
 
 ## Required Invariants
@@ -63,10 +63,11 @@ Frontend:
 ## Frontend Lifecycle Rules
 
 1. Auto-reconnect with bounded backoff.
-2. On reconnect, re-read the token from auth context — it may have been refreshed.
-3. Re-subscribe listeners after reconnect (provider-level pub/sub handles this).
-4. Only send when socket is open.
-5. Parse defensively; malformed server payloads must not crash UI.
+2. On reconnect, call `getAccessToken()` again — never reuse the previous attempt's token.
+3. On upgrade failure with 401, retry **once** with `getAccessToken(true)` before falling back to the backoff loop. This mirrors the HTTP client's retry pattern (`frontend/src/lib/http.ts`) and handles clock skew / JWKS rotation where a locally-cached token is rejected by the server. If the forced-refresh attempt also 401s, treat the user as logged out.
+4. Re-subscribe listeners after reconnect (provider-level pub/sub handles this).
+5. Only send when socket is open.
+6. Parse defensively; malformed server payloads must not crash UI.
 
 ## Testing in Dev
 
