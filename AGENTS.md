@@ -4,8 +4,14 @@ Never build, bundle or run tests in the project locally using commands like `car
 
 Always use the `gbandit` CLI to build and deploy:
 ```bash
-gbandit deploy [frontend|backend]
+gbandit deploy --message "<what you just changed>"
 ```
+
+Every deploy is a checkpoint. The CLI auto-commits the working tree with
+`--message` as the commit text, persists the commit sha on the pipeline
+run, and surfaces the message in the rollback UI. **Always pass
+`--message` describing what changed** so the user can pick the right
+checkpoint to roll back to.
 
 Other useful CLI commands:
 ```bash
