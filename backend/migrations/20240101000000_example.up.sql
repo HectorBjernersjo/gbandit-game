@@ -1,3 +1,0 @@
--- Add game-specific tables here.
--- User identity is managed by the auth service (separate DB).
--- Reference users by their user_id (text) from the JWT sub claim.

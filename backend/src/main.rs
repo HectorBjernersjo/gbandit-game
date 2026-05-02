@@ -2,7 +2,7 @@ use sqlx::postgres::PgPoolOptions;
 use std::error::Error;
 use tokio::net::TcpListener;
 
-use basegame_api::{AppState, app, auth::AuthVerifier, config::Config};
+use replace_with_project::{AppState, app, auth::AuthVerifier, config::Config};
 
 #[tokio::main]
 async fn main() {
@@ -15,7 +15,7 @@ async fn main() {
         .without_time()
         .with_env_filter(
             tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| "basegame_api=debug,tower_http=debug".into()),
+                .unwrap_or_else(|_| "replace_with_project=debug,tower_http=debug".into()),
         )
         .init();
 
