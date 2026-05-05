@@ -20,7 +20,7 @@ gbandit sql "SELECT ..."
 gbandit env [set|list|delete]
 ```
 
-The gbandit cli by default targets the dev environment, if you want to target stage or prod, use --environment [stage|prod]
+The gbandit cli by default targets the dev environment, if you want to target prod, use --environment prod
 
 ## Migrations
 - Migrations are applied automatically when deploying the backend.
