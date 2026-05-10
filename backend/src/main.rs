@@ -41,14 +41,14 @@ async fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
         Box::new(std::io::Error::other(error))
     })?;
 
-    let pool = PgPoolOptions::new()
-        .max_connections(10)
-        .connect(&config.database_url)
-        .await
-        .map_err(log_startup_error("failed to connect to database"))?;
+    // let pool = PgPoolOptions::new()
+    //     .max_connections(10)
+    //     .connect(&config.database_url)
+    //     .await
+    //     .map_err(log_startup_error("failed to connect to database"))?;
 
     let state = AppState {
-        pool,
+        // pool,
         config: config.clone(),
         auth_verifier,
     };

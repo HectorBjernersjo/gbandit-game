@@ -9,7 +9,7 @@ use std::time::Instant;
 
 use axum::Router;
 use axum::body::Body;
-use axum::extract::Request;
+use axum::extract::{FromRef, Request};
 use axum::middleware::{self, Next};
 use axum::response::Response;
 use axum::routing::get;
@@ -21,18 +21,18 @@ use errors::AppError;
 
 #[derive(Clone)]
 pub struct AppState {
-    pub pool: PgPool,
+    // pub pool: PgPool,
     pub config: Config,
     pub auth_verifier: AuthVerifier,
 }
 
-impl axum::extract::FromRef<AppState> for PgPool {
-    fn from_ref(state: &AppState) -> Self {
-        state.pool.clone()
-    }
-}
+// impl FromRef<AppState> for PgPool {
+//     fn from_ref(state: &AppState) -> Self {
+//         state.pool.clone()
+//     }
+// }
 
-impl axum::extract::FromRef<AppState> for Config {
+impl FromRef<AppState> for Config {
     fn from_ref(state: &AppState) -> Self {
         state.config.clone()
     }
