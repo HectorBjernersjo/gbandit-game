@@ -2,6 +2,11 @@
 
 Never build, bundle or run tests in the project locally using commands like `cargo build` or `bun run dev`. All building and deploying is handled remotely by the gbandit platform.
 
+If you don't have the `gbandit` CLI installed yet:
+```bash
+curl -fsSL https://github.com/HectorBjernersjo/gbandit-cli/releases/latest/download/install.sh | sh
+```
+
 Always use the `gbandit` CLI to build and deploy:
 ```bash
 gbandit deploy --message "<what you just changed>"
