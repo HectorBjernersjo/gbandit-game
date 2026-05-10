@@ -18,7 +18,7 @@ pub struct AccessTokenClaims {
     pub exp: i64,
     pub iat: i64,
     pub jti: String,
-    pub name: Option<String>,
+    pub username: Option<String>,
     pub email: Option<String>,
     #[serde(default)]
     pub is_anon: bool,
@@ -179,7 +179,7 @@ fn dev_user(name: &str) -> Option<AccessTokenClaims> {
         exp: i64::MAX,
         iat: 0,
         jti: format!("dev-{sub}"),
-        name: Some(name.to_lowercase()),
+        username: Some(name.to_lowercase()),
         email: Some(email.into()),
         is_anon: false,
     })
@@ -196,7 +196,7 @@ impl AuthenticatedUser {
     }
 
     pub fn name(&self) -> &str {
-        self.claims.name.as_deref().unwrap_or("Player")
+        self.claims.username.as_deref().unwrap_or("Player")
     }
 
     pub fn is_anon(&self) -> bool {

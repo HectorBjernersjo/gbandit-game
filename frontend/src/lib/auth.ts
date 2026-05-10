@@ -26,7 +26,7 @@ export function logoutUrl(redirect = window.location.origin): string {
 }
 
 export function guestUrl(redirect = window.location.href): string {
-  return `${authOrigin()}/api/anonymous?redirect=${encodeURIComponent(redirect)}`;
+  return loginUrl(redirect);
 }
 
 export async function getAccessToken(forceRefresh = false): Promise<string | null> {

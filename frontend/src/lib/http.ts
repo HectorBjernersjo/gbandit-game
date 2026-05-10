@@ -1,4 +1,5 @@
 import { getAccessToken } from "@/lib/auth";
+import { devApiFetch } from "@/lib/dev-auth/dev-fetch";
 
 export class ApiError extends Error {
   status: number;
@@ -43,7 +44,7 @@ function withBearer(init: RequestInit | undefined, token: string): RequestInit {
   return { ...init, headers };
 }
 
-export async function apiFetchWithToken<T>(path: string, init?: RequestInit): Promise<T> {
+async function prodApiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const fetchOnce = async (forceRefresh: boolean): Promise<T> => {
     let token: string | null;
     try {
@@ -65,4 +66,9 @@ export async function apiFetchWithToken<T>(path: string, init?: RequestInit): Pr
     }
     throw error;
   }
+}
+
+export async function apiFetchWithToken<T>(path: string, init?: RequestInit): Promise<T> {
+  if (import.meta.env.DEV) return devApiFetch<T>(path, init);
+  return prodApiFetch<T>(path, init);
 }

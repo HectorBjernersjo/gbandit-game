@@ -1,0 +1,70 @@
+name: game-template-local
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: game
+      POSTGRES_PASSWORD: game
+      POSTGRES_DB: game
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U game -d game"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  auth-stub:
+    image: nginx:alpine
+    volumes:
+      - ./auth-stub/jwks.json:/usr/share/nginx/html/jwks.json:ro
+    expose:
+      - "80"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/jwks.json"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  backend:
+    build:
+      context: ..
+      dockerfile: local-dev/backend.Dockerfile.dev
+    depends_on:
+      db:
+        condition: service_healthy
+      auth-stub:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://game:game@db:5432/game?sslmode=disable
+      AUTH_ISSUER: dev
+      AUTH_AUDIENCE: game-backend
+      AUTH_JWKS_URL: http://auth-stub/jwks.json
+      RUST_LOG: replace_with_project=debug,tower_http=debug
+    volumes:
+      - ../backend:/app
+      - cargo-registry:/usr/local/cargo/registry
+      - cargo-target:/app/target
+    expose:
+      - "8080"
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: local-dev/frontend.Dockerfile.dev
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ../frontend:/app
+      - frontend-node-modules:/app/node_modules
+
+volumes:
+  pgdata:
+  cargo-registry:
+  cargo-target:
+  frontend-node-modules:

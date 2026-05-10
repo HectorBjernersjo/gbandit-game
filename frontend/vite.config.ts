@@ -10,4 +10,14 @@ export default defineConfig({
       "@": path.resolve(__dirname, "src"),
     },
   },
+  // Dev-server only — `vite build` (used by the platform's prod pipeline) ignores `server`.
+  server: {
+    host: true,
+    proxy: {
+      "/api": {
+        target: "http://backend:8080",
+        changeOrigin: true,
+      },
+    },
+  },
 });
