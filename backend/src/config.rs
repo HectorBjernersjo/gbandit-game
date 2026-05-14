@@ -28,12 +28,7 @@ impl Config {
         let listen_addr = String::from("0.0.0.0:8080")
             .parse()
             .expect("Must use a valid listen address");
-        let auth_jwks_refresh_interval = Duration::from_secs(
-            env::var("AUTH_JWKS_REFRESH_INTERVAL_SECONDS")
-                .ok()
-                .and_then(|value| value.parse::<u64>().ok())
-                .unwrap_or(300),
-        );
+        let auth_jwks_refresh_interval = Duration::from_secs(300);
 
         Ok(Self {
             listen_addr,
