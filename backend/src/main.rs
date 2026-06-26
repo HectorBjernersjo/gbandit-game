@@ -1,4 +1,7 @@
 use sqlx::postgres::PgPoolOptions;
+// SQLite alternative imports (ADR 0014 §3.5) — use instead of the line above:
+// use sqlx::sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions};
+// use std::str::FromStr;
 use std::error::Error;
 use tokio::net::TcpListener;
 
@@ -41,9 +44,25 @@ async fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
         Box::new(std::io::Error::other(error))
     })?;
 
+    // Postgres — uncomment when you add a database:
     // let pool = PgPoolOptions::new()
     //     .max_connections(10)
     //     .connect(&config.database_url)
+    //     .await
+    //     .map_err(log_startup_error("failed to connect to database"))?;
+    //
+    // SQLite — use this block instead. `journal_mode = WAL` is load-bearing
+    // (the platform's Database tab and backups read the file concurrently,
+    // ADR 0014 §3.1a) and `create_if_missing` makes first boot work before any
+    // migration has run:
+    // let pool = SqlitePoolOptions::new()
+    //     .max_connections(5)
+    //     .connect_with(
+    //         SqliteConnectOptions::from_str(&config.database_url)
+    //             .map_err(log_startup_error("invalid DATABASE_URL"))?
+    //             .create_if_missing(true)
+    //             .journal_mode(SqliteJournalMode::Wal),
+    //     )
     //     .await
     //     .map_err(log_startup_error("failed to connect to database"))?;
 
