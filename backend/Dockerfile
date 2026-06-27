@@ -24,11 +24,12 @@ RUN --mount=type=secret,id=database_url \
 #     cp /run/secrets/db_schema /tmp/db_schema && \
 #     DATABASE_URL=sqlite:///tmp/db_schema cargo build && strip -o /app/replace_with_project target/debug/replace_with_project
 
-FROM debian:bookworm-slim
+FROM gcr.io/distroless/cc-debian12
+# Behöver du shella ut till systemverktyg (ffmpeg, python, sh, ...)?
+# Byt raden ovan mot:  FROM debian:bookworm-slim
+#   RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-
-RUN apt-get update && apt-get install -y ca-certificates curl && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /app/replace_with_project /app/replace_with_project
 
@@ -39,4 +40,4 @@ COPY --from=builder /app/replace_with_project /app/replace_with_project
 
 EXPOSE 80
 
-CMD ["sh", "-c", "exec ./replace_with_project"]
+CMD ["./replace_with_project"]
