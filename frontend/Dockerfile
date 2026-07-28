@@ -2,7 +2,9 @@ FROM node:22-alpine AS build
 
 WORKDIR /app
 COPY package.json package-lock.json* ./
-RUN npm install
+# npm's own download cache (~200 MB) is bigger than node_modules itself and is
+# useless once the install layer is cached, so it never gets to enter the layer.
+RUN npm install --no-audit --no-fund && npm cache clean --force
 
 COPY . .
 RUN npm run build
