@@ -27,25 +27,14 @@ RUN --mount=type=secret,id=database_url \
 #     cp /run/secrets/db_schema /tmp/db_schema && \
 #     DATABASE_URL=sqlite:///tmp/db_schema cargo build && cp target/debug/replace_with_project /app/replace_with_project
 
-FROM scratch
-# Behöver du shella ut till systemverktyg (ffmpeg, python, sh, ...)?
-# Byt raden ovan mot:  FROM debian:bookworm-slim
-#   RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+FROM gcr.io/distroless/cc-debian12
 
 WORKDIR /app
 
 COPY --from=builder /app/replace_with_project /app/replace_with_project
 
-# SQLite only (ADR 0014 §5, Alt 1): the platform's migration init-container
-# copies these out of the running image to apply them to the file on the PVC,
-# so the migrations must be baked in. Uncomment for SQLite:
-# COPY migrations /app/migrations
+EXPOSE 8080
 
-EXPOSE 80
-
-# Without this a panic logs its message and location but no stack at all, which
-# is the half that tells you how you got there. Costs nothing until something
-# panics. Set it to `full` if you want the runtime's own frames too.
 ENV RUST_BACKTRACE=1
 
 CMD ["./replace_with_project"]
