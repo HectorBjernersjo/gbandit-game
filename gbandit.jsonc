@@ -1,0 +1,15 @@
+{
+    "project": "replace-with-project",
+    "frontend": {
+        "dockerfile": "frontend/Dockerfile", "context": "frontend" 
+    },
+    "backend": {
+        "dockerfile": "backend/Dockerfile", "context": "backend" 
+    },
+    "database": {
+        "engine": "sqlite", "migrations": "backend/migrations"
+    },
+    "local_dev": {
+        "auto_commit": true
+    }
+}
