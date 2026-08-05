@@ -9,7 +9,6 @@ use replace_with_project::{AppState, app, auth::AuthVerifier, config::Config};
 
 #[tokio::main]
 async fn main() {
-    println!("heeaaaaej");
     let _ = dotenvy::dotenv();
 
     // Kubernetes adds an RFC3339 timestamp prefix to every log line via the

@@ -2,6 +2,10 @@
 
 Run the project on your laptop in Docker — no `gbandit deploy` needed.
 
+The compose stack always runs the backend and a Postgres database locally, even
+though deploys are frontend-only until you uncomment `backend` in
+`gbandit.jsonc` — so you can develop backend code before opting in.
+
 > **Note for AI agents:** the rule in `AGENTS.md` ("never build, bundle or run tests locally") applies to **you** (Pi Agent and other coding agents). Always use `gbandit deploy`. This `local-dev/` setup is for **human developers** running the stack on their laptop.
 
 ## AI agents

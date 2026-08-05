@@ -1,45 +1,34 @@
-## Building and deploying
-
-Never build, bundle or run tests in the project locally using commands like `cargo build` or `bun run dev`. All building and deploying is handled remotely by the gbandit platform.
-
-If you don't have the `gbandit` CLI installed yet:
-```bash
-curl -fsSL https://github.com/HectorBjernersjo/gbandit-cli/releases/latest/download/install.sh | sh
-```
+## The gbandit cli
 
 Always use the `gbandit` CLI to build and deploy:
 ```bash
 gbandit deploy --message "<what you just changed>"
 ```
 
-Every deploy is a checkpoint. The CLI auto-commits the working tree with
-`--message` as the commit text, persists the commit sha on the pipeline
-run, and surfaces the message in the rollback UI. **Always pass
-`--message` describing what changed** so the user can pick the right
-checkpoint to roll back to.
-
 Other useful CLI commands:
 ```bash
 gbandit logs [frontend|backend]
 gbandit sql "SELECT ..."
 gbandit env [set|list|delete]
+gbandit --help
 ```
+
+For more information about the platform, the cli, the config or anything else gbandit related, use the `gbandit docs` command.
 
 The gbandit cli by default targets the dev environment, if you want to target prod, use --environment prod
 
 ## Migrations
-- Migrations live in `backend/migrations/` and must be declared in `gbandit.jsonc` under `database`: `"database": { "engine": <engine>, "migrations": "backend/migrations" }`. Declared migrations are applied automatically when deploying the backend. You don't need to add any code to run migrations.
+- Declared migrations are applied automatically when deploying the backend. You don't need to add any code to run migrations.
 - DATABASE_URL is provided to the build (and the running pod) once the env is DB-backed, so you don't need to worry about sqlx in any way after writing your first migration.
 - Every migration must be reversible. Pair each `NNNN_foo.up.sql` with a matching `NNNN_foo.down.sql`.
-
-## Adding a database
-- Set `database` in `gbandit.jsonc` to `{ "engine": "postgres"|"sqlite", "migrations": "backend/migrations" }` (omitted = no database). The engine is locked once provisioned — changing it means recreating the project.
-- Then uncomment the database wiring that matches your engine. Both Postgres and SQLite ship as ready-to-uncomment reference blocks (copy, don't invent) in: `backend/Cargo.toml` (sqlx feature), `backend/src/lib.rs` (pool type + `FromRef`), `backend/src/main.rs` (pool init), and `backend/Dockerfile` (build secret line; for SQLite also the `COPY migrations` line). A binary is locked to one engine by its compile-time `query!` checks, so the wiring must match the engine you chose.
 
 ## Testing authenticated endpoints
 - In debug builds, send `X-Dev-User: eric` (`anna` and `steve` also work) as a header to bypass auth when testing backend endpoints.
 
 ## Rules
+- Never build, bundle or run tests in the project locally using commands like `cargo build` or `bun run dev`. All building and deploying is handled remotely by the gbandit platform.
+
+## General guidelines
 - When investigating an issue, it is often a good idea to add logs to identify the problem.
 - Only use try catch when you explicity expect there to be an error and you want to handle it. Never use it to "prevent bugs".
 - When encountering an issue, focus on addressing the root cause rather than treating the symptoms.

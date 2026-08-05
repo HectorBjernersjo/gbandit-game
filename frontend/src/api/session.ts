@@ -15,7 +15,12 @@ export async function getOptionalMe(): Promise<SessionUser | null> {
   try {
     return await getMe();
   } catch (error) {
-    if (error instanceof ApiError && error.status === 401) return null;
+    // 401 = not signed in. 404 = the platform gateway answering for a project
+    // whose backend isn't deployed (backend commented out in gbandit.jsonc) —
+    // treat both as "no user" instead of erroring the page.
+    if (error instanceof ApiError && (error.status === 401 || error.status === 404)) {
+      return null;
+    }
     throw error;
   }
 }

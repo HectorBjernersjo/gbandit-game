@@ -1,14 +1,17 @@
 {
     "project": "replace-with-project",
     "frontend": {
-        "dockerfile": "frontend/Dockerfile", "context": "frontend" 
+        "dockerfile": "frontend/Dockerfile", "context": "frontend"
     },
-    "backend": {
-        "dockerfile": "backend/Dockerfile", "context": "backend" 
-    },
-    "database": {
-        "engine": "sqlite", "migrations": "backend/migrations"
-    },
+    // Opt-in: uncomment `backend` to deploy the backend (see AGENTS.md).
+    // Add `database` when the backend needs one — also uncomment the DB
+    // wiring in backend/ (Cargo.toml, src/lib.rs, src/main.rs, Dockerfile).
+    // "backend": {
+    //     "dockerfile": "backend/Dockerfile", "context": "backend"
+    // },
+    // "database": {
+    //     "engine": "sqlite", "migrations": "backend/migrations"
+    // },
     "local_dev": {
         "auto_commit": true
     }

@@ -1,10 +1,13 @@
 import { createBrowserRouter } from "react-router";
-import { optionalUser, requireUser } from "@/api/session";
 import { Home } from "@/pages/Home";
-import { AuthLayout } from "@/pages/AuthLayout";
 import { NotFound } from "@/pages/NotFound";
 import { RouteError } from "@/pages/RouteError";
 import { Spinner } from "@/components/Spinner";
+// Auth-aware routing needs the backend (uncomment `backend` in gbandit.jsonc),
+// then swap in the commented routes below:
+// import { optionalUser, requireUser } from "@/api/session";
+// import { AuthHome } from "@/pages/AuthHome";
+// import { AuthLayout } from "@/pages/AuthLayout";
 
 export const router = createBrowserRouter([
   {
@@ -13,14 +16,19 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        loader: optionalUser,
         Component: Home,
       },
-      {
-        loader: requireUser,
-        Component: AuthLayout,
-        children: [],
-      },
+      // {
+      //   path: "/",
+      //   loader: optionalUser,
+      //   Component: AuthHome,
+      // },
+      // Routes that require a signed-in user go under AuthLayout:
+      // {
+      //   loader: requireUser,
+      //   Component: AuthLayout,
+      //   children: [],
+      // },
       {
         path: "*",
         Component: NotFound,

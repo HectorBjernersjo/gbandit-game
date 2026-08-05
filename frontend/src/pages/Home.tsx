@@ -1,19 +1,16 @@
-import { useLoaderData } from "react-router";
-import { type SessionUser } from "@/api/session";
-import { AuthProvider } from "@/lib/auth-context";
-import { HomeLoggedIn } from "@/pages/HomeLoggedIn";
-import { HomeLoggedOut } from "@/pages/HomeLoggedOut";
+import { GAME_NAME } from "@/config";
 
 export function Home() {
-  const user = useLoaderData<SessionUser | null>();
-
-  if (user) {
-    return (
-      <AuthProvider value={user}>
-        <HomeLoggedIn />
-      </AuthProvider>
-    );
-  }
-
-  return <HomeLoggedOut />;
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center gap-6">
+      <h1 className="text-4xl font-bold">{GAME_NAME}</h1>
+      <p className="text-lg text-foreground/60">
+        Your game starts here — edit{" "}
+        <code className="rounded bg-foreground/10 px-1.5 py-0.5 text-base">
+          frontend/src/pages/Home.tsx
+        </code>
+        .
+      </p>
+    </main>
+  );
 }
