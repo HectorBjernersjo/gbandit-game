@@ -1,3 +1,8 @@
 backend/target/
 frontend/node_modules/
 frontend/dist/
+
+# Machine-local Claude Code settings. This directory is published publicly and
+# the file accumulates whatever showed up in allowed commands, session tokens
+# included.
+.claude/settings.local.json
