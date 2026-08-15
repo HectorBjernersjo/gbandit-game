@@ -5,6 +5,11 @@ Always use the `gbandit` CLI to build and deploy:
 gbandit deploy --message "<what you just changed>"
 ```
 
+If no account is logged in yet and the project is frontend-only, create a
+guest account first with `gbandit login --guest` (no browser needed). A Google
+account (`gbandit login`) is only required for backend/database deploys and
+can be linked later — the guest's username and projects are kept.
+
 Other useful CLI commands:
 ```bash
 gbandit logs [frontend|backend]
@@ -23,7 +28,7 @@ The gbandit cli by default targets the dev environment, if you want to target pr
 - Every migration must be reversible. Pair each `NNNN_foo.up.sql` with a matching `NNNN_foo.down.sql`.
 
 ## Testing authenticated endpoints
-- In debug builds, send `X-Dev-User: eric` (`anna` and `steve` also work) as a header to bypass auth when testing backend endpoints.
+- In the dev environment, send `X-Dev-User: eric` (`anna` and `steve` also work) as a header to bypass auth when testing backend endpoints.
 
 ## Rules
 - Never build, bundle or run tests in the project locally using commands like `cargo build` or `bun run dev`. All building and deploying is handled remotely by the gbandit platform.

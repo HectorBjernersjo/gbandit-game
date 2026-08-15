@@ -2,6 +2,12 @@ FROM rust:1-slim-bookworm AS builder
 
 WORKDIR /app
 
+# SQLite alternative — uncomment this apt layer plus the SQLite RUN below and
+# remove the postgres RUN. Placed before COPY so the layer survives source
+# changes.
+# RUN apt-get update && apt-get install -y --no-install-recommends sqlite3 && \
+#     rm -rf /var/lib/apt/lists/*
+
 COPY . .
 
 # The pipeline runs migrations before this build and provides the tenant
@@ -17,21 +23,26 @@ RUN --mount=type=secret,id=database_url \
     --mount=type=cache,target=/app/target \
     DATABASE_URL=$(cat /run/secrets/database_url) cargo build && cp target/debug/replace_with_project /app/replace_with_project
 
-# SQLite alternative (ADR 0014 §3.5) — use this RUN instead of the one above.
-# The pipeline mounts a throwaway schema-only DB as the `db_schema` secret;
-# copy it to a writable path first since the secret mount is read-only and
-# sqlx opens the file read-write:
-# RUN --mount=type=secret,id=db_schema \
-#     --mount=type=cache,target=/usr/local/cargo/registry \
+# SQLite alternative — use this RUN instead of the one above (and uncomment the
+# apt layer up top). The build is self-contained: the migrations are applied to
+# a throwaway file so query! macros compile against the migrated schema. No
+# secrets involved — the same `docker build` works locally.
+# RUN --mount=type=cache,target=/usr/local/cargo/registry \
 #     --mount=type=cache,target=/app/target \
-#     cp /run/secrets/db_schema /tmp/db_schema && \
+#     for f in migrations/*.up.sql; do [ -e "$f" ] || continue; sqlite3 -bail /tmp/db_schema < "$f" || exit 1; done && \
 #     DATABASE_URL=sqlite:///tmp/db_schema cargo build && cp target/debug/replace_with_project /app/replace_with_project
 
-FROM gcr.io/distroless/cc-debian12
+# :debug carries a busybox shell, which the platform's db-migrate
+# init-container needs to copy /app/migrations out of this image (ADR 0019).
+FROM gcr.io/distroless/cc-debian12:debug
 
 WORKDIR /app
 
 COPY --from=builder /app/replace_with_project /app/replace_with_project
+
+# The platform's db-migrate init-container applies these to the live SQLite
+# file before the app starts — the image is the single source of migrations.
+COPY --from=builder /app/migrations /app/migrations
 
 EXPOSE 8080
 

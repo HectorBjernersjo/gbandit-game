@@ -115,7 +115,8 @@ fn verify_with_jwks(
         return Err("auth jwks cache is empty".into());
     }
 
-    let preferred = kid.and_then(|value| guard.iter().find(|key| key.kid.as_deref() == Some(value)));
+    let preferred =
+        kid.and_then(|value| guard.iter().find(|key| key.kid.as_deref() == Some(value)));
     if let Some(key) = preferred {
         return decode_claims(token, &key.decoding_key, validation);
     }
@@ -164,7 +165,6 @@ async fn fetch_jwks_keys(
     Ok(keys)
 }
 
-#[cfg(debug_assertions)]
 fn dev_user(name: &str) -> Option<AccessTokenClaims> {
     let (sub, email) = match name.to_lowercase().as_str() {
         "eric" => ("dev-eric", "eric@dev.local"),
@@ -207,13 +207,21 @@ impl AuthenticatedUser {
 impl FromRequestParts<AppState> for AuthenticatedUser {
     type Rejection = AppError;
 
-    async fn from_request_parts(parts: &mut Parts, state: &AppState) -> Result<Self, Self::Rejection> {
-        #[cfg(debug_assertions)]
-        if let Some(name) = parts.headers.get("x-dev-user").and_then(|v| v.to_str().ok()) {
-            let claims = dev_user(name)
-                .ok_or_else(|| AppError::BadRequest(format!("unknown dev user: {name}")))?;
-            tracing::debug!(user = name, "using dev auth bypass");
-            return Ok(Self { claims });
+    async fn from_request_parts(
+        parts: &mut Parts,
+        state: &AppState,
+    ) -> Result<Self, Self::Rejection> {
+        if state.config.dev_auth_enabled {
+            if let Some(name) = parts
+                .headers
+                .get("x-dev-user")
+                .and_then(|v| v.to_str().ok())
+            {
+                let claims = dev_user(name)
+                    .ok_or_else(|| AppError::BadRequest(format!("unknown dev user: {name}")))?;
+                tracing::debug!(user = name, "using dev auth bypass");
+                return Ok(Self { claims });
+            }
         }
 
         let auth_header = parts

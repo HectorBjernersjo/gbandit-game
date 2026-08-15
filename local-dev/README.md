@@ -25,7 +25,7 @@ The frontend (vite dev server) proxies `/api/*` to the backend, so there is one 
 
 ## Auth
 
-Local dev does **not** talk to `auth.gbandit.com`. Instead, the frontend sends an `X-Dev-User` header which the backend honours in debug builds (see `backend/src/auth.rs`).
+Local dev does **not** talk to `auth.gbandit.com`. Instead, the frontend sends an `X-Dev-User` header which the backend honours when `GBANDIT_ENVIRONMENT=dev` (see `backend/src/auth.rs`).
 
 A dev-toolbar appears in the bottom-right of the frontend (only when `import.meta.env.DEV`). Pick one of:
 

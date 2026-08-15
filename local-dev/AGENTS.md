@@ -15,7 +15,7 @@ The parent `AGENTS.md` instructs you to deploy via `gbandit deploy` and never bu
 
 ## Auth
 
-- The `X-Dev-User` header bypasses JWT verification (debug builds only — `backend/src/auth.rs`). Valid values: `eric`, `anna`, `steve`. Omit the header to test the unauthenticated path.
+- The `X-Dev-User` header bypasses JWT verification when `GBANDIT_ENVIRONMENT=dev`. Valid values: `eric`, `anna`, `steve`. Omit the header to test the unauthenticated path.
 - Do not use `auth.gbandit.com` URLs in local mode — they cannot reach a session cookie scoped to `localhost`.
 - The frontend dev-toolbar (bottom-right) sets the chosen user in `localStorage`; subsequent fetches add the header automatically.
 

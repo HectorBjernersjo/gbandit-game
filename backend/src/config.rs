@@ -8,6 +8,7 @@ use std::time::Duration;
 pub struct Config {
     pub listen_addr: SocketAddr,
     // pub database_url: String,
+    pub dev_auth_enabled: bool,
     pub auth_issuer: String,
     pub auth_audience: String,
     pub auth_jwks_url: String,
@@ -21,6 +22,12 @@ impl Config {
     // For important env variables it's better to not use fallbacks and panic when missing
     // so that bad configuration can be fixed immediately.
     pub fn from_env() -> Result<Self, ConfigError> {
+        let environment = env::var("GBANDIT_ENVIRONMENT").expect("GBANDIT_ENVIRONMENT must be set");
+        let dev_auth_enabled = match environment.as_str() {
+            "dev" => true,
+            "prod" => false,
+            other => panic!("GBANDIT_ENVIRONMENT must be dev or prod, got {other}"),
+        };
         let auth_issuer = env::var("AUTH_ISSUER").expect("AUTH_ISSUER must be set");
         let auth_audience = env::var("AUTH_AUDIENCE").expect("AUTH_AUDIENCE must be set");
         let auth_jwks_url = env::var("AUTH_JWKS_URL").expect("AUTH_JWKS_URL must be set");
@@ -33,6 +40,7 @@ impl Config {
         Ok(Self {
             listen_addr,
             // database_url,
+            dev_auth_enabled,
             auth_issuer,
             auth_audience,
             auth_jwks_url,

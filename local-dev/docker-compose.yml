@@ -40,6 +40,7 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: postgres://game:game@db:5432/game?sslmode=disable
+      GBANDIT_ENVIRONMENT: dev
       AUTH_ISSUER: dev
       AUTH_AUDIENCE: game-backend
       AUTH_JWKS_URL: http://auth-stub/jwks.json

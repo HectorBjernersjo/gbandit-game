@@ -10,8 +10,11 @@
     //     "dockerfile": "backend/Dockerfile", "context": "backend"
     // },
     // "database": {
-    //     "engine": "sqlite", "migrations": "backend/migrations"
+    //     "engine": "sqlite"
     // },
+    // For sqlite the migrations ship inside the backend image (/app/migrations,
+    // see backend/Dockerfile). Postgres instead declares where they live in the
+    // repo: "engine": "postgres", "migrations": "backend/migrations".
     "local_dev": {
         "auto_commit": true
     }
