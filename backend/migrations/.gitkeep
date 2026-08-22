@@ -1,0 +1,4 @@
+The Dockerfile copies /app/migrations into the runtime image unconditionally
+(ADR 0019: the image is the single source of migrations), so this directory has
+to exist even before the project declares a database. Keeps the backend build
+working on a fresh scaffold.
