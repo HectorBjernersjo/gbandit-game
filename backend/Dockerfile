@@ -34,8 +34,4 @@ EXPOSE 8080
 
 ENV RUST_BACKTRACE=1
 
-# The :debug base sets ENTRYPOINT ["/busybox/sh"], which would hand the CMD
-# to the shell and make it parse the binary as a script. Reset it.
-ENTRYPOINT []
-
 CMD ["./replace_with_project"]
