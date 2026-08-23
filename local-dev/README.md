@@ -2,9 +2,9 @@
 
 Run the project on your laptop in Docker — no `gbandit deploy` needed.
 
-The compose stack always runs the backend and a Postgres database locally, even
-though deploys are frontend-only until you uncomment `backend` in
-`gbandit.jsonc` — so you can develop backend code before opting in.
+The compose stack always runs the backend, even though deploys are frontend-only
+until you uncomment `backend` in `gbandit.jsonc` — so you can develop backend code
+before opting in.
 
 > **Note for AI agents:** the rule in `AGENTS.md` ("never build, bundle or run tests locally") applies to **you** (Pi Agent and other coding agents). Always use `gbandit deploy`. This `local-dev/` setup is for **human developers** running the stack on their laptop.
 
@@ -36,16 +36,16 @@ The choice persists in `localStorage`.
 
 ## Database
 
-Postgres runs as a service on `db:5432` inside the compose network (and `localhost:5432` from the host). `DATABASE_URL` is always set in the compose env.
+SQLite, in a named volume at `/data/db.sqlite` inside the backend container — the same path and the same `DATABASE_URL` a deployed pod gets. There is no database service to run.
 
 The `game-template` backend ships **DB-less** — `pool` and `database_url` are commented out in `main.rs` / `config.rs`. Backend ignores the URL until you un-comment them after writing your first migration.
 
-If `backend/migrations/` contains `*.up.sql` files, the backend container runs `sqlx migrate run` before starting the server.
+Your app applies its own migrations at boot (`sqlx::migrate!()` in `main.rs`), so a new `*.up.sql` reaches the database on the next restart — cargo-watch rebuilds and restarts on its own.
 
 ## Useful commands
 
 ```bash
-./scripts/psql.sh                    # psql shell into the dev DB
+docker compose exec backend sqlite3 /data/db.sqlite   # shell into the dev DB
 docker compose logs -f backend       # tail backend logs
 docker compose restart backend       # full restart (rare — cargo-watch usually handles it)
 docker compose down -v               # nuke everything including the DB volume
@@ -54,5 +54,5 @@ docker compose down -v               # nuke everything including the DB volume
 ## What is *not* here
 
 - No production parity. Tenant routing, real auth, and the real CNPG cluster live in the platform — not here.
-- No seed data. Add your own SQL via `./scripts/psql.sh < my-seed.sql` if you need it.
+- No seed data. Add your own SQL via `docker compose exec -T backend sqlite3 /data/db.sqlite < my-seed.sql` if you need it.
 - No tests run automatically. Run `docker compose exec backend cargo test` manually.

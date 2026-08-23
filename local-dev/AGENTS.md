@@ -10,7 +10,7 @@ The parent `AGENTS.md` instructs you to deploy via `gbandit deploy` and never bu
 
 - **Frontend (`frontend/`)** — vite HMR. Edit a `.tsx`/`.ts` and the browser updates in ~1s. No restart.
 - **Backend (`backend/`)** — `cargo watch` recompiles and restarts on `.rs` changes. Watch with `docker compose -f local-dev/docker-compose.yml logs -f backend`.
-- **Migrations** — adding a new `NNNN_foo.up.sql` / `NNNN_foo.down.sql` requires `docker compose -f local-dev/docker-compose.yml restart backend` so the container re-runs `sqlx migrate run` before booting.
+- **Migrations** — a new `NNNN_foo.up.sql` triggers a rebuild (`backend/build.rs` tells cargo the directory is an input) and the app applies it on the next boot. `docker compose -f local-dev/docker-compose.yml restart backend` forces it.
 - **Compose / Dockerfile.dev changes** — `docker compose -f local-dev/docker-compose.yml up -d --build`.
 
 ## Auth
@@ -45,14 +45,13 @@ docker compose -f local-dev/docker-compose.yml exec backend cargo test
 ```bash
 docker compose -f local-dev/docker-compose.yml logs -f <service>
 docker compose -f local-dev/docker-compose.yml restart backend
-local-dev/scripts/psql.sh
+docker compose -f local-dev/docker-compose.yml exec backend sqlite3 /data/db.sqlite
 docker compose -f local-dev/docker-compose.yml down       # stop
 docker compose -f local-dev/docker-compose.yml down -v    # stop + wipe DB
 ```
 
 ## Rules that still apply from the parent AGENTS.md
 
-- Migration reversibility (`*.up.sql` paired with `*.down.sql`).
 - Root-cause fixes over symptom-patching.
 - Add to `TODO.md` if a fix is out of scope for the current task.
 - No `try/catch` for "preventing bugs".

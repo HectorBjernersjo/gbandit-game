@@ -4,17 +4,15 @@
         "dockerfile": "frontend/Dockerfile", "context": "frontend"
     },
     // Opt-in: uncomment `backend` to deploy the backend (see AGENTS.md).
-    // Add `database` when the backend needs one — also uncomment the DB
-    // wiring in backend/ (Cargo.toml, src/lib.rs, src/main.rs, Dockerfile).
+    // Add `database` when the backend needs one — that also means uncommenting
+    // the database wiring in backend/ (Cargo.toml, src/config.rs, src/lib.rs,
+    // src/main.rs) and writing your first migration in backend/migrations/.
     // "backend": {
     //     "dockerfile": "backend/Dockerfile", "context": "backend"
     // },
     // "database": {
     //     "engine": "sqlite"
     // },
-    // For sqlite the migrations ship inside the backend image (/app/migrations,
-    // see backend/Dockerfile). Postgres instead declares where they live in the
-    // repo: "engine": "postgres", "migrations": "backend/migrations".
     "local_dev": {
         "auto_commit": true
     }

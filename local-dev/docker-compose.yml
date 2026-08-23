@@ -1,22 +1,6 @@
 name: game-template-local
 
 services:
-  db:
-    image: postgres:16
-    environment:
-      POSTGRES_USER: game
-      POSTGRES_PASSWORD: game
-      POSTGRES_DB: game
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U game -d game"]
-      interval: 2s
-      timeout: 2s
-      retries: 30
-
   auth-stub:
     image: nginx:alpine
     volumes:
@@ -34,12 +18,12 @@ services:
       context: ..
       dockerfile: local-dev/backend.Dockerfile.dev
     depends_on:
-      db:
-        condition: service_healthy
       auth-stub:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgres://game:game@db:5432/game?sslmode=disable
+      # Same URL the platform sets in a deployed pod, so the app opens the file
+      # the same way here as it does there.
+      DATABASE_URL: sqlite:///data/db.sqlite
       GBANDIT_ENVIRONMENT: dev
       AUTH_ISSUER: dev
       AUTH_AUDIENCE: game-backend
@@ -47,6 +31,7 @@ services:
       RUST_LOG: replace_with_project=debug,tower_http=debug
     volumes:
       - ../backend:/app
+      - game-data:/data
       - cargo-registry:/usr/local/cargo/registry
       - cargo-target:/app/target
     expose:
@@ -65,7 +50,7 @@ services:
       - frontend-node-modules:/app/node_modules
 
 volumes:
-  pgdata:
+  game-data:
   cargo-registry:
   cargo-target:
   frontend-node-modules:

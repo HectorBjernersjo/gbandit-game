@@ -13,9 +13,7 @@ use axum::extract::{FromRef, Request};
 use axum::middleware::{self, Next};
 use axum::response::Response;
 use axum::routing::get;
-// Database pool type — `PgPool` for Postgres, `SqlitePool` for SQLite
-// (ADR 0014 §3.5). Uncomment the one matching your engine when you add a DB.
-use sqlx::PgPool;
+// Uncomment when you add a database.
 // use sqlx::SqlitePool;
 
 use auth::AuthVerifier;
@@ -24,15 +22,14 @@ use errors::AppError;
 
 #[derive(Clone)]
 pub struct AppState {
-    // Uncomment for a database; the type matches your engine (`PgPool` /
-    // `SqlitePool`). The pool is opened only when DATABASE_URL is present, so
-    // DB routes can 503 cleanly while the project is still DB-less.
-    // pub pool: PgPool,
+    // Uncomment for a database. The pool is opened only when DATABASE_URL is
+    // present, so DB routes can 503 cleanly while the project is still DB-less.
+    // pub pool: SqlitePool,
     pub config: Config,
     pub auth_verifier: AuthVerifier,
 }
 
-// impl FromRef<AppState> for PgPool {  // SQLite: `impl FromRef<AppState> for SqlitePool`
+// impl FromRef<AppState> for SqlitePool {
 //     fn from_ref(state: &AppState) -> Self {
 //         state.pool.clone()
 //     }

@@ -1,5 +1,4 @@
-use sqlx::postgres::PgPoolOptions;
-// SQLite alternative imports (ADR 0014 §3.5) — use instead of the line above:
+// Uncomment together with the pool in `run` when you add a database.
 // use sqlx::sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions};
 // use std::str::FromStr;
 use std::error::Error;
@@ -43,17 +42,10 @@ async fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
         Box::new(std::io::Error::other(error))
     })?;
 
-    // Postgres — uncomment when you add a database:
-    // let pool = PgPoolOptions::new()
-    //     .max_connections(10)
-    //     .connect(&config.database_url)
-    //     .await
-    //     .map_err(log_startup_error("failed to connect to database"))?;
-    //
-    // SQLite — use this block instead. `journal_mode = WAL` is load-bearing
-    // (the platform's Database tab and backups read the file concurrently,
-    // ADR 0014 §3.1a) and `create_if_missing` makes first boot work before any
-    // migration has run:
+    // Uncomment when you add a database. `journal_mode = WAL` is load-bearing:
+    // the Database tab and the backup sweep read the file while the game is
+    // running. `create_if_missing` makes the very first boot work, before any
+    // migration has created anything.
     // let pool = SqlitePoolOptions::new()
     //     .max_connections(5)
     //     .connect_with(
@@ -64,6 +56,16 @@ async fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
     //     )
     //     .await
     //     .map_err(log_startup_error("failed to connect to database"))?;
+    //
+    // Your code owns your schema. This applies every migration in
+    // backend/migrations that has not run yet, before the server accepts its
+    // first request — so a migration that fails stops the boot and fails the
+    // deploy with its own error. `migrate!` reads the directory at compile
+    // time, which is why it is commented out until the directory exists.
+    // sqlx::migrate!("./migrations")
+    //     .run(&pool)
+    //     .await
+    //     .map_err(log_startup_error("failed to apply migrations"))?;
 
     let state = AppState {
         // pool,

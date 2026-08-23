@@ -22,11 +22,6 @@ For more information about the platform, the cli, the config or anything else gb
 
 The gbandit cli by default targets the dev environment, if you want to target prod, use --environment prod
 
-## Migrations
-- Declared migrations are applied automatically when deploying the backend. You don't need to add any code to run migrations.
-- DATABASE_URL is provided to the build (and the running pod) once the env is DB-backed, so you don't need to worry about sqlx in any way after writing your first migration.
-- Every migration must be reversible. Pair each `NNNN_foo.up.sql` with a matching `NNNN_foo.down.sql`.
-
 ## Testing authenticated endpoints
 - In the dev environment, send `X-Dev-User: eric` (`anna` and `steve` also work) as a header to bypass auth when testing backend endpoints.
 

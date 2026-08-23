@@ -1,19 +1,16 @@
 FROM rust:1-bookworm
 
+# sqlite3 is here so `docker compose exec backend sqlite3 /data/db.sqlite` gives
+# you a shell on the dev database.
 RUN apt-get update \
-    && apt-get install -y curl \
+    && apt-get install -y curl sqlite3 \
     && rm -rf /var/lib/apt/lists/*
 
 RUN cargo install cargo-watch --locked
-RUN cargo install sqlx-cli --no-default-features --features postgres --locked
 
 WORKDIR /app
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "\
-    if ls migrations/*.up.sql >/dev/null 2>&1; then \
-        sqlx migrate run --source ./migrations || exit 1; \
-    fi && \
-    cargo watch -x run \
-"]
+# The app applies its own migrations at boot, so there is nothing to run first.
+CMD ["cargo", "watch", "-x", "run"]
