@@ -22,6 +22,22 @@ For more information about the platform, the cli, the config or anything else gb
 
 The gbandit cli by default targets the dev environment, if you want to target prod, use --environment prod
 
+## Database and schema
+Your code owns the schema. The platform provisions the database and hands the
+backend a `DATABASE_URL`; nothing else touches it.
+
+- Adding or changing a table: write a new `backend/migrations/NNNN_<name>.up.sql`
+  (next number in sequence, never edit an applied one) and deploy. The backend
+  applies pending migrations at boot via `sqlx::migrate!()`, and the build replays
+  them into a throwaway schema so `query!` typechecks against them.
+- A migration that fails at boot fails the deploy with the app's own error in
+  `gbandit logs backend`.
+- There is no rollback. To undo a migration, write another migration that moves
+  the schema forward to what you want. To start over, remove the `volume` from
+  `gbandit.jsonc`, run `gbandit deploy --confirm-database-removal` (this deletes
+  the environment's data), put the `volume` back and deploy again; the next boot
+  rebuilds the schema from scratch.
+
 ## Testing authenticated endpoints
 - In the dev environment, send `X-Dev-User: eric` (`anna` and `steve` also work) as a header to bypass auth when testing backend endpoints.
 
