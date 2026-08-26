@@ -15,13 +15,10 @@ pub struct Config {
     pub auth_jwks_refresh_interval: Duration,
 }
 
-#[derive(Debug, thiserror::Error)]
-pub enum ConfigError {}
-
 impl Config {
     // For important env variables it's better to not use fallbacks and panic when missing
     // so that bad configuration can be fixed immediately.
-    pub fn from_env() -> Result<Self, ConfigError> {
+    pub fn from_env() -> Self {
         let environment = env::var("GBANDIT_ENVIRONMENT").expect("GBANDIT_ENVIRONMENT must be set");
         let dev_auth_enabled = match environment.as_str() {
             "dev" => true,
@@ -37,7 +34,7 @@ impl Config {
             .expect("Must use a valid listen address");
         let auth_jwks_refresh_interval = Duration::from_secs(300);
 
-        Ok(Self {
+        Self {
             listen_addr,
             // database_url,
             dev_auth_enabled,
@@ -45,6 +42,6 @@ impl Config {
             auth_audience,
             auth_jwks_url,
             auth_jwks_refresh_interval,
-        })
+        }
     }
 }

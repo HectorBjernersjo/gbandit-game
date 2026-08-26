@@ -21,7 +21,7 @@ COPY . .
 # Costs ~9 MB in the image.
 RUN --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/app/target \
-    for f in migrations/*.up.sql; do [ -e "$f" ] || continue; sqlite3 -bail /tmp/db_schema < "$f" || exit 1; done && \
+    for f in migrations/*.sql; do [ -e "$f" ] || continue; sqlite3 -bail /tmp/db_schema < "$f" || exit 1; done && \
     DATABASE_URL=sqlite:///tmp/db_schema cargo build && cp target/debug/replace_with_project /app/replace_with_project
 
 FROM gcr.io/distroless/cc-debian12

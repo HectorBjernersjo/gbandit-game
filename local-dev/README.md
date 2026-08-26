@@ -40,7 +40,7 @@ SQLite, in a named volume at `/data/db.sqlite` inside the backend container — 
 
 The `game-template` backend ships **DB-less** — `pool` and `database_url` are commented out in `main.rs` / `config.rs`. Backend ignores the URL until you un-comment them after writing your first migration.
 
-Your app applies its own migrations at boot (`sqlx::migrate!()` in `main.rs`), so a new `*.up.sql` reaches the database on the next restart — cargo-watch rebuilds and restarts on its own.
+Your app applies its own migrations at boot (`sqlx::migrate!()` in `main.rs`), so a new `*.sql` reaches the database on the next restart — cargo-watch rebuilds and restarts on its own.
 
 ## Useful commands
 

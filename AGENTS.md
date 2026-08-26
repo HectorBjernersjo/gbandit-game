@@ -26,7 +26,7 @@ The gbandit cli by default targets the dev environment, if you want to target pr
 Your code owns the schema. The platform provisions the database and hands the
 backend a `DATABASE_URL`; nothing else touches it.
 
-- Adding or changing a table: write a new `backend/migrations/NNNN_<name>.up.sql`
+- Adding or changing a table: write a new `backend/migrations/NNNN_<name>.sql`
   (next number in sequence, never edit an applied one) and deploy. The backend
   applies pending migrations at boot via `sqlx::migrate!()`, and the build replays
   them into a throwaway schema so `query!` typechecks against them.
