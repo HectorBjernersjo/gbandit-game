@@ -10,7 +10,7 @@ The parent `AGENTS.md` instructs you to deploy via `gbandit deploy` and never bu
 
 - **Frontend (`frontend/`)** — vite HMR. Edit a `.tsx`/`.ts` and the browser updates in ~1s. No restart.
 - **Backend (`backend/`)** — `cargo watch` recompiles and restarts on `.rs` changes. Watch with `docker compose -f local-dev/docker-compose.yml logs -f backend`.
-- **Migrations** — a new `NNNN_foo.up.sql` triggers a rebuild (`backend/build.rs` tells cargo the directory is an input) and the app applies it on the next boot. `docker compose -f local-dev/docker-compose.yml restart backend` forces it.
+- **Migrations** — a new `NNNN_foo.sql` triggers a rebuild (`backend/build.rs` tells cargo the directory is an input) and the app applies it on the next boot. `docker compose -f local-dev/docker-compose.yml restart backend` forces it.
 - **Compose / Dockerfile.dev changes** — `docker compose -f local-dev/docker-compose.yml up -d --build`.
 
 ## Auth

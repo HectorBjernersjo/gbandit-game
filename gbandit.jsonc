@@ -4,14 +4,13 @@
         "dockerfile": "frontend/Dockerfile", "context": "frontend"
     },
     // Opt-in: uncomment `backend` to deploy the backend (see AGENTS.md).
-    // Add `database` when the backend needs one — that also means uncommenting
-    // the database wiring in backend/ (Cargo.toml, src/config.rs, src/lib.rs,
-    // src/main.rs) and writing your first migration in backend/migrations/.
+    // Uncomment `volume` when the backend needs a database: it gets a disk at
+    // /data and a SQLite DATABASE_URL. That also means uncommenting the database
+    // wiring in backend/ (src/config.rs, src/lib.rs, src/main.rs)
+    // and writing your first migration in backend/migrations/.
     // "backend": {
-    //     "dockerfile": "backend/Dockerfile", "context": "backend"
-    // },
-    // "database": {
-    //     "engine": "sqlite"
+    //     "dockerfile": "backend/Dockerfile", "context": "backend",
+    //     // "volume": { "sqlite": true }
     // },
     "local_dev": {
         "auto_commit": true

@@ -28,7 +28,7 @@ async fn main() {
 }
 
 async fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
-    let config = Config::from_env().map_err(log_startup_error("failed to load config"))?;
+    let config = Config::from_env();
     let auth_verifier = AuthVerifier::from_jwks_url(
         config.auth_issuer.clone(),
         config.auth_audience.clone(),
@@ -60,8 +60,7 @@ async fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
     // Your code owns your schema. This applies every migration in
     // backend/migrations that has not run yet, before the server accepts its
     // first request — so a migration that fails stops the boot and fails the
-    // deploy with its own error. `migrate!` reads the directory at compile
-    // time, which is why it is commented out until the directory exists.
+    // deploy with its own error.
     // sqlx::migrate!("./migrations")
     //     .run(&pool)
     //     .await

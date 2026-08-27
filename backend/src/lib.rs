@@ -22,8 +22,7 @@ use errors::AppError;
 
 #[derive(Clone)]
 pub struct AppState {
-    // Uncomment for a database. The pool is opened only when DATABASE_URL is
-    // present, so DB routes can 503 cleanly while the project is still DB-less.
+    // Uncomment when you add a database.
     // pub pool: SqlitePool,
     pub config: Config,
     pub auth_verifier: AuthVerifier,
